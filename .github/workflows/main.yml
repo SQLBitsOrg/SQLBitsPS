@@ -198,8 +198,8 @@ jobs:
       shell: pwsh
       run: ./build.ps1 -ResolveDependency -tasks publish
       env:
-        GitHubToken: ${{ env.GitHubToken }}
-        GalleryApiToken: ${{ env.GalleryApiToken }}
+        GITHUBTOKEN: ${{ env.GITHUBTOKEN }}
+        GalleryApiToken: ${{ env.GALLERYAPITOKEN }}
     - name: Send Changelog PR
       shell: pwsh
       run: ./build.ps1 -ResolveDependency -tasks Create_ChangeLog_GitHub_PR
