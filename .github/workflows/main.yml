@@ -29,7 +29,7 @@ jobs:
       with:
         configFilePath: GitVersion.yml
     - name: Build & Package Module
-      shell: powershell
+      shell: pwsh
       run: ./build.ps1 -ResolveDependency -tasks pack
       env:
         ModuleVersion: ${{ env.gitVersion.NuGetVersionV2 }}
@@ -103,7 +103,7 @@ jobs:
     - name: Download Build Artifact
       uses: actions/download-artifact@v2
     - name: Run Tests
-      shell: powershell
+      shell: pwsh
       run: ./build.ps1 -tasks test
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
