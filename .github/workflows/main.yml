@@ -34,8 +34,9 @@ jobs:
       env:
         ModuleVersion: ${{ env.gitVersion.NuGetVersionV2 }}
     - name: Publish Build Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
+        name: module
         path: ${{ env.buildFolderName }}/
 #  Test_Stage_test_linux:
 #    name: Linux
@@ -49,7 +50,7 @@ jobs:
 #        ref: ${{ github.head_ref }}   # checkout the correct branch name
 #        fetch-depth: 0  
 #    - name: Download Build Artifact
-#      uses: actions/download-artifact@v2
+#      uses: actions/download-artifact@v3
 #    - name: Run Tests
 #      shell: pwsh
 #      run: ./build.ps1 -ResolveDependency -tasks test
@@ -59,7 +60,7 @@ jobs:
 #      with:
 #        nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/NUnit*.xml
 #    - name: Publish Test Artifact
-#      uses: actions/upload-artifact@v2
+#      uses: actions/upload-artifact@v3
 #      with:
 #        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
 #        name: CodeCoverageLinux
@@ -75,7 +76,7 @@ jobs:
 #        ref: ${{ github.head_ref }}   # checkout the correct branch name
 #        fetch-depth: 0  
 #    - name: Download Build Artifact
-#      uses: actions/download-artifact@v2
+#      uses: actions/download-artifact@v3
 #    - name: Run Tests
 #      shell: pwsh
 #      run: ./build.ps1 -ResolveDependency -tasks test
@@ -85,7 +86,7 @@ jobs:
 #      with:
 #        nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/NUnit*.xml
 #    - name: Publish Test Artifact
-#      uses: actions/upload-artifact@v2
+#      uses: actions/upload-artifact@v3
 #      with:
 #        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
 #        name: CodeCoverageWinPS7
@@ -101,7 +102,7 @@ jobs:
 #        ref: ${{ github.head_ref }}   # checkout the correct branch name
 #        fetch-depth: 0  
 #    - name: Download Build Artifact
-#      uses: actions/download-artifact@v2
+#      uses: actions/download-artifact@v3
 #    - name: Run Tests
 #      shell: pwsh
 #      run: ./build.ps1 -ResolveDependency -tasks test
@@ -111,7 +112,7 @@ jobs:
 #      with:
 #        nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/NUnit*.xml
 #    - name: Publish Test Artifact
-#      uses: actions/upload-artifact@v2
+#      uses: actions/upload-artifact@v3
 #      with:
 #        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
 #        name: CodeCoverageWinPS51
@@ -127,7 +128,7 @@ jobs:
 #        ref: ${{ github.head_ref }}   # checkout the correct branch name
 #        fetch-depth: 0  
 #    - name: Download Build Artifact
-#      uses: actions/download-artifact@v2
+#      uses: actions/download-artifact@v3
 #    - name: Run Tests
 #      shell: pwsh
 #      run: ./build.ps1 -ResolveDependency -tasks test
@@ -137,7 +138,7 @@ jobs:
 #      with:
 #        nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/NUnit*.xml
 #    - name: Publish Test Artifact
-#      uses: actions/upload-artifact@v2
+#      uses: actions/upload-artifact@v3
 #      with:
 #        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
 #        name: CodeCoverageMacOS
@@ -163,15 +164,15 @@ jobs:
 #        echo "##vso[task.setvariable variable=RepositoryName;isOutput=true]$repositoryName"
 #      shell: pwsh
 #    - name: Download Pipeline Artifact
-#      uses: actions/download-artifact@v2
+#      uses: actions/download-artifact@v3
 #    - name: Download Test Artifact macOS
-#      uses: actions/download-artifact@v2
+#      uses: actions/download-artifact@v3
 #    - name: Download Test Artifact Linux
-#      uses: actions/download-artifact@v2
+#      uses: actions/download-artifact@v3
 #    - name: Download Test Artifact Windows (PS 5.1)
-#      uses: actions/download-artifact@v2
+#      uses: actions/download-artifact@v3
 #    - name: Download Test Artifact Windows (PS7)
-#      uses: actions/download-artifact@v2
+#      uses: actions/download-artifact@v3
   Deploy_Stage_Deploy_Module:
     name: Deploy Module
     runs-on: ubuntu-latest
@@ -189,7 +190,9 @@ jobs:
         ref: ${{ github.head_ref }}   # checkout the correct branch name
         fetch-depth: 0  
     - name: Download Build Artifact
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
+      with:
+        name: module
     - name: Publish Release
       shell: pwsh
       run: ./build.ps1 -ResolveDependency -tasks publish
