@@ -52,7 +52,7 @@ jobs:
       uses: actions/download-artifact@v2
     - name: Run Tests
       shell: pwsh
-      run: ./build.ps1 -tasks test
+      run: ./build.ps1 -ResolveDependency -tasks test
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
@@ -78,7 +78,7 @@ jobs:
       uses: actions/download-artifact@v2
     - name: Run Tests
       shell: pwsh
-      run: ./build.ps1 -tasks test
+      run: ./build.ps1 -ResolveDependency -tasks test
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
@@ -104,7 +104,7 @@ jobs:
       uses: actions/download-artifact@v2
     - name: Run Tests
       shell: pwsh
-      run: ./build.ps1 -tasks test
+      run: ./build.ps1 -ResolveDependency -tasks test
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
@@ -130,7 +130,7 @@ jobs:
       uses: actions/download-artifact@v2
     - name: Run Tests
       shell: pwsh
-      run: ./build.ps1 -tasks test
+      run: ./build.ps1 -ResolveDependency -tasks test
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
@@ -192,13 +192,13 @@ jobs:
       uses: actions/download-artifact@v2
     - name: Publish Release
       shell: pwsh
-      run: ./build.ps1 -tasks publish
+      run: ./build.ps1 -ResolveDependency -tasks publish
       env:
         GitHubToken: ${{ env.GitHubToken }}
         GalleryApiToken: ${{ env.GalleryApiToken }}
     - name: Send Changelog PR
       shell: pwsh
-      run: ./build.ps1 -tasks Create_ChangeLog_GitHub_PR
+      run: ./build.ps1 -ResolveDependency -tasks Create_ChangeLog_GitHub_PR
       env:
         GitHubToken: ${{ env.GitHubToken }}
                     
