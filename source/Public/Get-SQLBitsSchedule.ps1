@@ -1,49 +1,50 @@
-<#
-.SYNOPSIS
-Gets the SQLBits Schedule from the Sessionize API
 
-.DESCRIPTION
-Gets the SQLBits Schedule from the Sessionize API and outputs to json, excel, psobject, html or csv
-
-.PARAMETER Output
-The type of output required. Valid values are json, excel, psobject, html or csv
-
-.PARAMETER fileDirectory
-The directory to save the output file to - defaults to Env:Temp
-
-.PARAMETER Show
-Whether to open the output file after it has been created
-
-.EXAMPLE
-Get-SQLBitsSchedule  -Output Excel -Show
-
-Gets the SQLBits Schedule from the Sessionize API and outputs to excel, opens the file and saves it to the default temp directory
-
-.EXAMPLE
-Get-SQLBitsSchedule  -Output Raw
-
-Gets the SQLBits Schedule from the Sessionize API and outputs as json on the screen
-
-.EXAMPLE
-Get-SQLBitsSchedule  -Output csv -Show
-
-Gets the SQLBits Schedule from the Sessionize API and outputs to csv, opens the file and saves it to the default temp directory
-
-.EXAMPLE
-Get-SQLBitsSchedule  -Output object
-
-Gets the SQLBits Schedule from the Sessionize API and outputs as a psobject on the screen
-
-.EXAMPLE
-Get-SQLBitsSchedule  -Output html -Show
-
-Gets the SQLBits Schedule from the Sessionize API and outputs to html, opens the file and saves it to the default temp directory
-
-.NOTES
-Author: Rob Sewell
-December 2022
-#>
 function Get-SQLBitsSchedule {
+    <#
+    .SYNOPSIS
+        Gets the SQLBits Schedule from the Sessionize API
+
+    .DESCRIPTION
+        Gets the SQLBits Schedule from the Sessionize API and outputs to json, excel, psobject, html or csv
+
+    .PARAMETER Output
+        The type of output required. Valid values are json, excel, psobject, html or csv
+
+    .PARAMETER fileDirectory
+        The directory to save the output file to - defaults to Env:Temp
+
+    .PARAMETER Show
+        Whether to open the output file after it has been created
+
+    .EXAMPLE
+        Get-SQLBitsSchedule  -Output Excel -Show
+
+        Gets the SQLBits Schedule from the Sessionize API and outputs to excel, opens the file and saves it to the default temp directory
+
+    .EXAMPLE
+        Get-SQLBitsSchedule  -Output Raw
+
+        Gets the SQLBits Schedule from the Sessionize API and outputs as json on the screen
+
+    .EXAMPLE
+        Get-SQLBitsSchedule  -Output csv -Show
+
+        Gets the SQLBits Schedule from the Sessionize API and outputs to csv, opens the file and saves it to the default temp directory
+
+    .EXAMPLE
+        Get-SQLBitsSchedule  -Output object
+
+        Gets the SQLBits Schedule from the Sessionize API and outputs as a psobject on the screen
+
+    .EXAMPLE
+        Get-SQLBitsSchedule  -Output html -Show
+
+        Gets the SQLBits Schedule from the Sessionize API and outputs to html, opens the file and saves it to the default temp directory
+
+    .NOTES
+        Author: Rob Sewell
+        December 2022
+#>
     [CmdletBinding()]
     param (
         [Parameter()]
@@ -176,6 +177,8 @@ function Get-SQLBitsSchedule {
             $sessions | Sort-Object Day, StartsAt | Export-Csv -Path $FilePath -NoTypeInformation
             if ($Show) {
                 Invoke-Item $filepath
+            }else {
+                Write-Output "Csv file saved to $FilePath"
             }
         }
         'html' {
@@ -183,6 +186,8 @@ function Get-SQLBitsSchedule {
             $sessions | ConvertTo-Html | out-file $FilePath
                 if ($Show) {
                     Invoke-Item $filepath
+                }else {
+                    Write-Output "Html file saved to $FilePath"
                 }
         }
         Default {

@@ -1,4 +1,6 @@
-<#
+
+function Get-SQLBitsTrainingDay {
+    <#
 .SYNOPSIS
 Gets the SQLBits Training Day Schedule from the Sessionize API
 
@@ -43,7 +45,6 @@ Gets the SQLBits Training Day Schedule from the Sessionize API and outputs to ht
 Author: Rob Sewell
 December 2022
 #>
-function Get-SQLBitsTrainingDay {
     [CmdletBinding()]
     param (
         [Parameter()]
@@ -55,15 +56,15 @@ function Get-SQLBitsTrainingDay {
         $Show
     )
 
-    $BaseUri = 'https://sessionize.com/api/v2/u1qovn3p/view'
+    $BaseUri = 'https://sessionize.com/api/v2/sydgl43f/view'
     $Date = Get-Date -Format 'yyyy-MM-dd-HH-mm-ss'
 
     #TODO Add other options
     $filter = 'Schedule'
     switch ($filter) {
-        'All' {
-            $uri = '{0}/All' -f $BaseUri
-        }
+       # 'All' {
+       #     $uri = '{0}/All' -f $BaseUri
+       # }
         'Schedule' {
             $uri = '{0}/All' -f $BaseUri
         }
@@ -79,8 +80,20 @@ function Get-SQLBitsTrainingDay {
     }
 
     $Data = Invoke-RestMethod -Uri $uri
+    if(-not $Data){
+        Write-Warning 'No data returned from Sessionize API'
+        return
+    }
     $rooms = ($data.rooms | Sort-Object name)
+    if(-not $rooms){
+        Write-Warning 'No rooms returned from Sessionize API'
+        return
+    }
     $Speakers = $data.speakers
+    if(-not $Speakers){
+        Write-Warning 'No Speakers returned from Sessionize API'
+        return
+    }
     # Thank you Shane - https://nocolumnname.blog/2020/10/29/pivot-in-powershell/
     $props = @(
         @{ Name = 'Day' ; Expression = { $Psitem.Group[0].startsAt.DayOfWeek } }
@@ -142,6 +155,8 @@ function Get-SQLBitsTrainingDay {
                     }
                     if ($Show) {
                         Invoke-Item $filepath
+                    }else {
+                        Write-Output "Excel file saved to $FilePath"
                     }
                 }
             } else {
@@ -150,6 +165,8 @@ function Get-SQLBitsTrainingDay {
                 $sessions | Sort-Object Day, StartsAt | Export-Csv -Path $FilePath -NoTypeInformation
                 if ($Show) {
                     Invoke-Item $filepath
+                }else {
+                    Write-Output "Csv file saved to $FilePath"
                 }
             }
 
@@ -159,6 +176,8 @@ function Get-SQLBitsTrainingDay {
             $sessions | Sort-Object Day, StartsAt | Export-Csv -Path $FilePath -NoTypeInformation
             if ($Show) {
                 Invoke-Item $filepath
+            }else {
+                Write-Output "Csv file saved to $FilePath"
             }
         }
         'html' {
@@ -166,6 +185,8 @@ function Get-SQLBitsTrainingDay {
             $sessions | ConvertTo-Html | out-file $FilePath
                 if ($Show) {
                     Invoke-Item $filepath
+                }else {
+                    Write-Output "Html file saved to $FilePath"
                 }
         }
         Default {

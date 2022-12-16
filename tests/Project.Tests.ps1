@@ -1,11 +1,11 @@
 BeforeDiscovery {
-    $script:ModuleName = 'dbachecks'
+    $script:ModuleName = 'SQLBitsPS'
     $ModuleBase = (Get-Module -Name $ModuleName -ListAvailable).ModuleBase
     $commands = Get-Command -Module $ModuleName -CommandType Cmdlet, Function
 }
 Describe 'PSScriptAnalyzer rule-sets' -Tag Build , ScriptAnalyzer {
     BeforeDiscovery {
-        $script:ModuleName = 'dbachecks'
+        $script:ModuleName = 'SQLBitsPS'
         $ModuleBase = (Get-Module -Name $ModuleName -ListAvailable).ModuleBase
         $Rules = Get-ScriptAnalyzerRule
         $scripts = Get-ChildItem $ModuleBase -Include *.ps1, *.psm1, *.psd1 -Recurse | Where-Object fullname -NotMatch 'classes'
