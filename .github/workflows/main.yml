@@ -194,9 +194,12 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: module
+    - name: find the module
+      shell: pwsh
+      run: gci * -recurse
     - name: Publish Release
       shell: pwsh
-      run: ./build.ps1 -ResolveDependency -tasks publish
+      run: ./build.ps1 -ResolveDependency -tasks build, publish
       env:
         GITHUBTOKEN: ${{ secrets.GITHUBTOKEN }}
         GalleryApiToken: ${{ secrets.GALLERYAPITOKEN }}
