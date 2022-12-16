@@ -15,21 +15,22 @@ jobs:
     name: Package Module
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Code
+      uses: actions/checkout@v3
       with:
-        fetch-depth: 0
+        ref: ${{ github.head_ref }}   # checkout the correct branch name
+        fetch-depth: 0  
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v0.9.11
+      uses: gittools/actions/gitversion/setup@v0.9.15
       with:
         versionSpec: 5.x
     - name: Evaluate Next Version
-      uses: gittools/actions/gitversion/execute@v0.9.11
+      uses: gittools/actions/gitversion/execute@v0.9.15
       with:
         configFilePath: GitVersion.yml
     - name: Build & Package Module
       shell: powershell
-      run: |
-        ./build.ps1 -ResolveDependency -tasks pack
+      run: ./build.ps1 -ResolveDependency -tasks pack
       env:
         ModuleVersion: ${{ env.gitVersion.NuGetVersionV2 }}
     - name: Publish Build Artifact
@@ -42,13 +43,16 @@ jobs:
     needs:
     - Build_Stage_Package_Module
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}   # checkout the correct branch name
+        fetch-depth: 0  
     - name: Download Build Artifact
       uses: actions/download-artifact@v2
     - name: Run Tests
       shell: pwsh
-      run: |
-        ./build.ps1 -tasks test
+      run: ./build.ps1 -tasks test
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
@@ -65,13 +69,16 @@ jobs:
     needs:
     - Build_Stage_Package_Module
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}   # checkout the correct branch name
+        fetch-depth: 0  
     - name: Download Build Artifact
       uses: actions/download-artifact@v2
     - name: Run Tests
       shell: pwsh
-      run: |
-        ./build.ps1 -tasks test
+      run: ./build.ps1 -tasks test
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
@@ -88,13 +95,16 @@ jobs:
     needs:
     - Build_Stage_Package_Module
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}   # checkout the correct branch name
+        fetch-depth: 0  
     - name: Download Build Artifact
       uses: actions/download-artifact@v2
     - name: Run Tests
       shell: powershell
-      run: |
-        ./build.ps1 -tasks test
+      run: ./build.ps1 -tasks test
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
@@ -111,13 +121,16 @@ jobs:
     needs:
     - Build_Stage_Package_Module
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}   # checkout the correct branch name
+        fetch-depth: 0  
     - name: Download Build Artifact
       uses: actions/download-artifact@v2
     - name: Run Tests
       shell: pwsh
-      run: |
-        ./build.ps1 -tasks test
+      run: ./build.ps1 -tasks test
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
@@ -138,7 +151,11 @@ jobs:
     - Test_Stage_test_windows_core
     - Test_Stage_test_windows_ps
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}   # checkout the correct branch name
+        fetch-depth: 0  
     - name: Set Environment Variables
       run: |
         $repositoryOwner,$repositoryName = $env:BUILD_REPOSITORY_NAME -split '/'
@@ -166,20 +183,22 @@ jobs:
     - Test_Stage_Code_Coverage
     if: success() && (github.ref == 'refs/heads/main')
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}   # checkout the correct branch name
+        fetch-depth: 0  
     - name: Download Build Artifact
       uses: actions/download-artifact@v2
     - name: Publish Release
       shell: pwsh
-      run: |
-        ./build.ps1 -tasks publish
+      run: ./build.ps1 -tasks publish
       env:
         GitHubToken: ${{ env.GitHubToken }}
         GalleryApiToken: ${{ env.GalleryApiToken }}
     - name: Send Changelog PR
       shell: pwsh
-      run: |
-        ./build.ps1 -tasks Create_ChangeLog_GitHub_PR
+      run: ./build.ps1 -tasks Create_ChangeLog_GitHub_PR
       env:
         GitHubToken: ${{ env.GitHubToken }}
                     
