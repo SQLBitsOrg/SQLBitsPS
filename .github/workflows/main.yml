@@ -90,7 +90,7 @@ jobs:
       shell: pwsh
       run: ./build.ps1 -ResolveDependency -tasks test
     - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2
+      uses: EnricoMi/publish-unit-test-result-action/composite@v2
       if: always()
       with:
         nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/NUnit*.xml
@@ -119,7 +119,7 @@ jobs:
       shell: pwsh
       run: ./build.ps1 -ResolveDependency -tasks test
     - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2
+      uses: EnricoMi/publish-unit-test-result-action/composite@v2
       if: always()
       with:
         nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/NUnit*.xml
@@ -148,7 +148,7 @@ jobs:
       shell: pwsh
       run: ./build.ps1 -ResolveDependency -tasks test
     - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2
+      uses: EnricoMi/publish-unit-test-result-action/composite@v2
       if: always()
       with:
         nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/NUnit*.xml
