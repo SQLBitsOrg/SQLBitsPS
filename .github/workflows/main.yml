@@ -36,7 +36,7 @@ jobs:
     - name: Publish Build Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: ${{ env.buildArtifactNamebuildArtifactName }}
+        name: ${{ env.buildArtifactName }}
         path: ${{ env.buildFolderName }}/
   Test_Stage_test_linux:
     name: Linux
@@ -199,7 +199,7 @@ jobs:
     - name: Download Build Artifact
       uses: actions/download-artifact@v3
       with:
-        name: module
+        name:  ${{ env.buildArtifactName }}
     - name: Publish Release
       shell: pwsh
       run: ./build.ps1 -ResolveDependency -tasks publish
