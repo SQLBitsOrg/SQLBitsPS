@@ -212,13 +212,13 @@ jobs:
         path: ${{ env.buildFolderName }}
     - name: Publish Release
       shell: pwsh
-      run: ./build.ps1 -ResolveDependency -tasks publish
+      run: ./build.ps1 -tasks publish
       env:
         GITHUBTOKEN: ${{ secrets.GITHUBTOKEN }}
         GalleryApiToken: ${{ secrets.GALLERYAPITOKEN }}
     - name: Send Changelog PR
       shell: pwsh
-      run: ./build.ps1 -ResolveDependency -tasks Create_ChangeLog_GitHub_PR
+      run: Get-Module -Name PowerShellForGitHub -ListAvailable ;./build.ps1  -tasks Create_ChangeLog_GitHub_PR
       env:
         GitHubToken: ${{ secrets.GitHubToken }}
                     
