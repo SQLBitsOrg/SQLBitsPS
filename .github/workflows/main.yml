@@ -208,7 +208,8 @@ jobs:
     - name: Download Build Artifact
       uses: actions/download-artifact@v3
       with:
-        name:  ${{ env.buildArtifactName }}
+        name: ${{ env.buildArtifactName }}
+        path: ${{ env.buildFolderName }}
     - name: Publish Release
       shell: pwsh
       run: ./build.ps1 -ResolveDependency -tasks publish
