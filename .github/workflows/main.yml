@@ -36,34 +36,40 @@ jobs:
     - name: Publish Build Artifact
       uses: actions/upload-artifact@v3
       with:
-        name: module
+        name: ${{ buildArtifactName }}
         path: ${{ env.buildFolderName }}/
-#  Test_Stage_test_linux:
-#    name: Linux
-#    runs-on: ubuntu-latest
-#    needs:
-#    - Build_Stage_Package_Module
-#    steps:
-#    - name: Checkout Code
-#      uses: actions/checkout@v3
-#      with:
-#        ref: ${{ github.head_ref }}   # checkout the correct branch name
-#        fetch-depth: 0  
-#    - name: Download Build Artifact
-#      uses: actions/download-artifact@v3
-#    - name: Run Tests
-#      shell: pwsh
-#      run: ./build.ps1 -ResolveDependency -tasks test
-#    - name: Publish Test Results
-#      uses: EnricoMi/publish-unit-test-result-action@v2
-#      if: always()
-#      with:
-#        nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/NUnit*.xml
-#    - name: Publish Test Artifact
-#      uses: actions/upload-artifact@v3
-#      with:
-#        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
-#        name: CodeCoverageLinux
+  Test_Stage_test_linux:
+    name: Linux
+    runs-on: ubuntu-latest
+    needs:
+    - Build_Stage_Package_Module
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.head_ref }}   # checkout the correct branch name
+        fetch-depth: 0  
+    - name: Download Build Artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: ${{ buildArtifactName }}
+        path: ${{ env.buildFolderName }}
+    - name: find the module
+      shell: pwsh
+      run: gci * -recurse
+    - name: Run Tests
+      shell: pwsh
+      run: ./build.ps1 -tasks test
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/NUnit*.xml
+    - name: Publish Test Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
+        name: CodeCoverageLinux
 #  Test_Stage_test_windows_core:
 #    name: Windows (PowerShell)
 #    runs-on: windows-2019
@@ -178,7 +184,7 @@ jobs:
     runs-on: ubuntu-latest
     needs:
      - Build_Stage_Package_Module
-   # - Test_Stage_test_linux
+     - Test_Stage_test_linux
    # - Test_Stage_test_windows_core
    # - Test_Stage_test_windows_ps
    # - Test_Stage_test_macos
@@ -194,12 +200,9 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: module
-    - name: find the module
-      shell: pwsh
-      run: gci * -recurse
     - name: Publish Release
       shell: pwsh
-      run: ./build.ps1 -ResolveDependency -tasks build, publish
+      run: ./build.ps1 -ResolveDependency -tasks publish
       env:
         GITHUBTOKEN: ${{ secrets.GITHUBTOKEN }}
         GalleryApiToken: ${{ secrets.GALLERYAPITOKEN }}
