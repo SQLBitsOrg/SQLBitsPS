@@ -24,13 +24,13 @@ GUID = 'ddaef87d-8633-43ec-ade3-094ed587e36d'
 Author = 'Rob Sewell'
 
 # Company or vendor of this module
-CompanyName = 'Unknown'
+CompanyName = 'robsewell.com'
 
 # Copyright statement for this module
 Copyright = '(c) Rob Sewell. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'A module for gathering information about SQLBits agenda'
+Description = 'A module for gathering information about SQLBits agenda. This module can be used to return the information in Sessionize about the SQLBits agenda in a number of formats for both training days and general sessions.'
 
 # Minimum version of the PowerShell engine required by this module
 # PowerShellVersion = ''
@@ -96,13 +96,13 @@ PrivateData = @{
 
         Prerelease = ''
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+         Tags = @('SQLBits', 'Sessionize', 'Agenda', 'Training', 'Sessions')
 
         # A URL to the license for this module.
-        # LicenseUri = ''
+         LicenseUri = 'https://github.com/SQLDBAWithABeard/SQLBitsPS/blob/main/LICENSE'
 
         # A URL to the main website for this project.
-        # ProjectUri = ''
+         ProjectUri = 'https://github.com/SQLDBAWithABeard/SQLBitsPS'
 
         # A URL to an icon representing this module.
         # IconUri = ''
