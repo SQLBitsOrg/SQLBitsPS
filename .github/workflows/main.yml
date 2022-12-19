@@ -178,24 +178,28 @@ jobs:
       if: always()
       with:
         nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageMacOS/NUnit*.xml
+        check_name: MacOs Test Results
     - name: Publish Linux Test Results
       id: linux-test-results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
         nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageLinux/NUnit*.xml
+        check_name: Linux Test Results
     - name: Publish WinPS51 Test Results
       id: winps51-test-results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
         nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageWinPS51/NUnit*.xml
+        check_name: WinPS51 Test Results
     - name: Publish WinPS71 Test Results
       id: winps71-test-results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
         nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageWinPS7/NUnit*.xml
+        check_name: WinPS71 Test Results
     - name: Set Macos badge color
       shell: bash
       run: |
