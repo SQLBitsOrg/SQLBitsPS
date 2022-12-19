@@ -156,27 +156,170 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: CodeCoverageMacOS
-        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
+        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageMacOS/
     - name: Download Test Artifact Linux
       uses: actions/download-artifact@v3
       with:
         name: CodeCoverageLinux
-        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
+        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageLinux/
     - name: Download Test Artifact Windows (PS 5.1)
       uses: actions/download-artifact@v3
       with:
         name: CodeCoverageWinPS51
-        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
+        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageWinPS51/
     - name: Download Test Artifact Windows (PS7)
       uses: actions/download-artifact@v3
       with:
         name: CodeCoverageWinPS7
-        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
-    - name: Publish Test Results
+        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageWinPS7/
+    - name: Publish MacOs Test Results
+      id: macos-test-results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
-        nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/NUnit*.xml
+        nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageMacOS/NUnit*.xml
+    - name: Publish Linux Test Results
+      id: linux-test-results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageLinux/NUnit*.xml
+    - name: Publish WinPS51 Test Results
+      id: winps51-test-results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageWinPS51/NUnit*.xml
+    - name: Publish WinPS71 Test Results
+      id: winps71-test-results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/CodeCoverageWinPS7/NUnit*.xml
+    - name: Set Macos badge color
+      shell: bash
+      run: |
+        case ${{ fromJSON( steps.test-results.outputs.json ).conclusion }} in
+          success)
+            echo "MACOSBADGE_COLOR=31c653" >> $GITHUB_ENV
+            ;;
+          failure)
+            echo "MACOSBADGE_COLOR=800000" >> $GITHUB_ENV
+            ;;
+          neutral)
+            echo "MACOSBADGE_COLOR=696969" >> $GITHUB_ENV
+            ;;
+        esac
+    - name: Create Macos badge
+      uses: emibcn/badge-action@d6f51ff11b5c3382b3b88689ae2d6db22d9737d1
+      with:
+        label: Macos-Tests
+        status: '${{ fromJSON( steps.macos-test-results.outputs.json ).formatted.stats.tests }} tests, ${{ fromJSON( steps.test-results.outputs.json ).formatted.stats.runs }} runs: ${{ fromJSON( steps.test-results.outputs.json ).conclusion }}'
+        color: ${{ env.MACOSBADGE_COLOR }}
+        path: macos-badge.svg
+    - name: Upload MacOs badge to Gist
+      # Upload only for main branch
+      if: >
+        github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' ||
+        github.event_name != 'workflow_run' && github.ref == 'refs/heads/main'
+      uses: andymckay/append-gist-action@1fbfbbce708a39bd45846f0955ed5521f2099c6d
+      with:
+        token: ${{ secrets.GIST_TOKEN }}
+        gistURL: https://gist.githubusercontent.com/SQLDBAWithABeard/b1fc4cba1712da56f2673c147f5787f2
+        file: macos-badge.svg
+    - name: Set Linux badge color
+      shell: bash
+      run: |
+        case ${{ fromJSON( steps.linux-test-results.outputs.json ).conclusion }} in
+          success)
+            echo "LINUXBADGE_COLOR=31c653" >> $GITHUB_ENV
+            ;;
+          failure)
+            echo "LINUXBADGE_COLOR=800000" >> $GITHUB_ENV
+            ;;
+          neutral)
+            echo "LINUXBADGE_COLOR=696969" >> $GITHUB_ENV
+            ;;
+        esac
+    - name: Create Linux badge
+      uses: emibcn/badge-action@d6f51ff11b5c3382b3b88689ae2d6db22d9737d1
+      with:
+        label: Linux-Tests
+        status: '${{ fromJSON( steps.linux-test-results.outputs.json ).formatted.stats.tests }} tests, ${{ fromJSON( steps.test-results.outputs.json ).formatted.stats.runs }} runs: ${{ fromJSON( steps.test-results.outputs.json ).conclusion }}'
+        color: ${{ env.LINUXBADGE_COLOR }}
+        path: linux-badge.svg
+    - name: Upload Linux badge to Gist
+      # Upload only for main branch
+      if: >
+        github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' ||
+        github.event_name != 'workflow_run' && github.ref == 'refs/heads/main'
+      uses: andymckay/append-gist-action@1fbfbbce708a39bd45846f0955ed5521f2099c6d
+      with:
+        token: ${{ secrets.GIST_TOKEN }}
+        gistURL: https://gist.githubusercontent.com/SQLDBAWithABeard/b1fc4cba1712da56f2673c147f5787f2
+        file: linux-badge.svg
+    - name: Set WinPS51 badge color
+      shell: bash
+      run: |
+        case ${{ fromJSON( steps.linux-test-results.outputs.json ).conclusion }} in
+          success)
+            echo "WINPS51BADGE_COLOR=31c653" >> $GITHUB_ENV
+            ;;
+          failure)
+            echo "WINPS51BADGE_COLOR=800000" >> $GITHUB_ENV
+            ;;
+          neutral)
+            echo "WINPS51BADGE_COLOR=696969" >> $GITHUB_ENV
+            ;;
+        esac
+    - name: Create WINPS51 badge
+      uses: emibcn/badge-action@d6f51ff11b5c3382b3b88689ae2d6db22d9737d1
+      with:
+        label: WinPS51-Tests
+        status: '${{ fromJSON( steps.linux-test-results.outputs.json ).formatted.stats.tests }} tests, ${{ fromJSON( steps.test-results.outputs.json ).formatted.stats.runs }} runs: ${{ fromJSON( steps.test-results.outputs.json ).conclusion }}'
+        color: ${{ env.WINPS51BADGE_COLOR }}
+        path: winps51-badge.svg
+    - name: Upload WINPS51 badge to Gist
+      # Upload only for main branch
+      if: >
+        github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' ||
+        github.event_name != 'workflow_run' && github.ref == 'refs/heads/main'
+      uses: andymckay/append-gist-action@1fbfbbce708a39bd45846f0955ed5521f2099c6d
+      with:
+        token: ${{ secrets.GIST_TOKEN }}
+        gistURL: https://gist.githubusercontent.com/SQLDBAWithABeard/b1fc4cba1712da56f2673c147f5787f2
+        file: winps51-badge.svg
+    - name: Set WinPS7 badge color
+      shell: bash
+      run: |
+        case ${{ fromJSON( steps.linux-test-results.outputs.json ).conclusion }} in
+          success)
+            echo "WINPS7BADGE_COLOR=31c653" >> $GITHUB_ENV
+            ;;
+          failure)
+            echo "WINPS7BADGE_COLOR=800000" >> $GITHUB_ENV
+            ;;
+          neutral)
+            echo "WINPS7BADGE_COLOR=696969" >> $GITHUB_ENV
+            ;;
+        esac
+    - name: Create WinPS7 badge
+      uses: emibcn/badge-action@d6f51ff11b5c3382b3b88689ae2d6db22d9737d1
+      with:
+        label: WinPS7-Tests
+        status: '${{ fromJSON( steps.linux-test-results.outputs.json ).formatted.stats.tests }} tests, ${{ fromJSON( steps.test-results.outputs.json ).formatted.stats.runs }} runs: ${{ fromJSON( steps.test-results.outputs.json ).conclusion }}'
+        color: ${{ env.WINPS7BADGE_COLOR }}
+        path: winps7-badge.svg
+    - name: Upload WINPS7 badge to Gist
+      # Upload only for main branch
+      if: >
+        github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'main' ||
+        github.event_name != 'workflow_run' && github.ref == 'refs/heads/main'
+      uses: andymckay/append-gist-action@1fbfbbce708a39bd45846f0955ed5521f2099c6d
+      with:
+        token: ${{ secrets.GIST_TOKEN }}
+        gistURL: https://gist.githubusercontent.com/SQLDBAWithABeard/b1fc4cba1712da56f2673c147f5787f2
+        file: winps7-badge.svg
   Deploy_Stage_Deploy_Module:
     name: Deploy Module
     runs-on: ubuntu-latest
