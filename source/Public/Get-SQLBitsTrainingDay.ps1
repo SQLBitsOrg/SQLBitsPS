@@ -116,7 +116,13 @@ December 2022
         }
     )
 
-    $sessions = $Data.sessions | Group-Object -Property StartsAt | Select-Object $props
+    if($IsCoreCLR){
+        $rawsessions = $Data.sessions 
+    } else {
+        $rawsessions = $Data.sessions | Select -Property id, title,@{Name = 'startsAt';expression = {[datetime]$_.startsAt}} , @{Name = 'endsAt';expression = {[datetime]$_.endsAt}}, roomID, speakers
+
+    }
+    $sessions = $rawsessions | Group-Object -Property StartsAt | Select-Object $props
 
     switch ($output) {
         'Raw' {

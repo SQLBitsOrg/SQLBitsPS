@@ -97,7 +97,7 @@ function Get-SQLBitsSchedule {
     }
     # Thank you Shane - https://nocolumnname.blog/2020/10/29/pivot-in-powershell/
     $props = @(
-        @{ Name = 'Day' ; Expression = { $Psitem.Group[0].startsAt.DayOfWeek } }
+        @{ Name = 'Day' ; Expression = { [datetime]$Psitem.Group[0].startsAt.DayOfWeek } }
         @{ Name = 'Date' ; Expression = { $Psitem.Group[0].startsAt.tolongdatestring() } }
         @{ Name = 'StartTime' ; Expression = { $Psitem.Group[0].startsAt.ToShortTimeString() } }
         @{ Name = 'EndTime' ; Expression = { $Psitem.Group[0].EndsAt.ToShortTimeString() } }
@@ -116,8 +116,13 @@ function Get-SQLBitsSchedule {
             }
         }
     )
+    if($IsCoreCLR){
+        $rawsessions = $Data.sessions 
+    } else {
+        $rawsessions = $Data.sessions | Select -Property id, title,@{Name = 'startsAt';expression = {[datetime]$_.startsAt}} , @{Name = 'endsAt';expression = {[datetime]$_.endsAt}}, roomID, speakers
 
-    $sessions = $Data.sessions | Group-Object -Property StartsAt | Select-Object $props
+    }
+    $sessions = $rawsessions | Group-Object -Property StartsAt | Select-Object $props
 
     switch ($output) {
         'Raw' {
