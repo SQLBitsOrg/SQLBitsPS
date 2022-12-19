@@ -97,7 +97,7 @@ function Get-SQLBitsSchedule {
     }
     # Thank you Shane - https://nocolumnname.blog/2020/10/29/pivot-in-powershell/
     $props = @(
-        @{ Name = 'Day' ; Expression = { [datetime]$Psitem.Group[0].startsAt.DayOfWeek } }
+        @{ Name = 'Day' ; Expression = { $Psitem.Group[0].startsAt.DayOfWeek } }
         @{ Name = 'Date' ; Expression = { $Psitem.Group[0].startsAt.tolongdatestring() } }
         @{ Name = 'StartTime' ; Expression = { $Psitem.Group[0].startsAt.ToShortTimeString() } }
         @{ Name = 'EndTime' ; Expression = { $Psitem.Group[0].EndsAt.ToShortTimeString() } }
