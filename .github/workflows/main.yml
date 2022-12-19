@@ -152,22 +152,31 @@ jobs:
       with:
         ref: ${{ github.head_ref }}   # checkout the correct branch name
         fetch-depth: 0  
-    - name: Set Environment Variables
-      run: |
-        $repositoryOwner,$repositoryName = $env:BUILD_REPOSITORY_NAME -split '/'
-        echo "##vso[task.setvariable variable=RepositoryOwner;isOutput=true]$repositoryOwner"
-        echo "##vso[task.setvariable variable=RepositoryName;isOutput=true]$repositoryName"
-      shell: pwsh
-    - name: Download Pipeline Artifact
-      uses: actions/download-artifact@v3
     - name: Download Test Artifact macOS
       uses: actions/download-artifact@v3
+      with:
+        name: CodeCoverageMacOS
+        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
     - name: Download Test Artifact Linux
       uses: actions/download-artifact@v3
+      with:
+        name: CodeCoverageLinux
+        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
     - name: Download Test Artifact Windows (PS 5.1)
       uses: actions/download-artifact@v3
+      with:
+        name: CodeCoverageWinPS51
+        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
     - name: Download Test Artifact Windows (PS7)
       uses: actions/download-artifact@v3
+      with:
+        name: CodeCoverageWinPS7
+        path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
+    - name: Publish Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
+      with:
+        nunit_files: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/NUnit*.xml
   Deploy_Stage_Deploy_Module:
     name: Deploy Module
     runs-on: ubuntu-latest
@@ -192,10 +201,10 @@ jobs:
         path: ${{ env.buildFolderName }}
     - name: Publish Release
       shell: pwsh
-      run: ./build.ps1 -tasks publish
+      run: Import-Module output\RequiredModules\PowerShellForGitHub\0.16.1\PowerShellForGitHub.psd1 ; ./build.ps1 -tasks publish
       env:
-        GITHUBTOKEN: ${{ secrets.GITHUBTOKEN }}
-        GalleryApiToken: ${{ secrets.GALLERYAPITOKEN }} 
+        GitHubToken: ${{ secrets.GitHubToken }}
+        GalleryApiToken: ${{ secrets.GalleryApiToken }} 
     - name: Send Changelog PR
       shell: pwsh
       run: Get-Module -Name PowerShellForGitHub -ListAvailable ;./build.ps1  -tasks Create_ChangeLog_GitHub_PR
