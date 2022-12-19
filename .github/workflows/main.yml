@@ -215,9 +215,9 @@ jobs:
             ;;
         esac
     - name: Create Macos badge
-      uses: emibcn/badge-action@d6f51ff11b5c3382b3b88689ae2d6db22d9737d1
+      uses:  emibcn/badge-action@v1.2.1
       with:
-        label: Macos-Tests
+        label: Tests
         status: '${{ fromJSON( steps.macos-test-results.outputs.json ).formatted.stats.tests }} tests, ${{ fromJSON( steps.macos-test-results.outputs.json ).formatted.stats.runs }} runs: ${{ fromJSON( steps.macos-test-results.outputs.json ).conclusion }}'
         color: ${{ env.MACOSBADGE_COLOR }}
         path: macos-badge.svg
@@ -246,9 +246,9 @@ jobs:
             ;;
         esac
     - name: Create Linux badge
-      uses: emibcn/badge-action@d6f51ff11b5c3382b3b88689ae2d6db22d9737d1
+      uses:  emibcn/badge-action@v1.2.1
       with:
-        label: Linux-Tests
+        label: Tests
         status: '${{ fromJSON( steps.linux-test-results.outputs.json ).formatted.stats.tests }} tests, ${{ fromJSON( steps.linux-test-results.outputs.json ).formatted.stats.runs }} runs: ${{ fromJSON( steps.linux-test-results.outputs.json ).conclusion }}'
         color: ${{ env.LINUXBADGE_COLOR }}
         path: linux-badge.svg
@@ -277,9 +277,9 @@ jobs:
             ;;
         esac
     - name: Create WINPS51 badge
-      uses: emibcn/badge-action@d6f51ff11b5c3382b3b88689ae2d6db22d9737d1
+      uses:  emibcn/badge-action@v1.2.1
       with:
-        label: WinPS51-Tests
+        label: Tests
         status: '${{ fromJSON( steps.winps51-test-results.outputs.json ).formatted.stats.tests }} tests, ${{ fromJSON( steps.winps51-test-results.outputs.json ).formatted.stats.runs }} runs: ${{ fromJSON( steps.winps51-test-results.outputs.json ).conclusion }}'
         color: ${{ env.WINPS51BADGE_COLOR }}
         path: winps51-badge.svg
@@ -308,9 +308,9 @@ jobs:
             ;;
         esac
     - name: Create WinPS7 badge
-      uses: emibcn/badge-action@d6f51ff11b5c3382b3b88689ae2d6db22d9737d1
+      uses:  emibcn/badge-action@v1.2.1
       with:
-        label: WinPS7-Tests
+        label: Tests
         status: '${{ fromJSON( steps.winps71-test-results.outputs.json ).formatted.stats.tests }} tests, ${{ fromJSON( steps.winps71-test-results.outputs.json ).formatted.stats.runs }} runs: ${{ fromJSON( steps.winps71-test-results.outputs.json ).conclusion }}'
         color: ${{ env.WINPS7BADGE_COLOR }}
         path: winps7-badge.svg
