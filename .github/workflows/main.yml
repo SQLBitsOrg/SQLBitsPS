@@ -4,8 +4,9 @@ on:
     - main
     paths-ignore:
     - CHANGELOG.md
-    tags-ignore:
-    - '*'
+    tags:
+    - '**'
+    - '!*preview*'
 env:
   buildFolderName: output
   buildArtifactName: output
