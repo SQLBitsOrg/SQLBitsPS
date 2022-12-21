@@ -1,0 +1,31 @@
+# from https://gitversion.net/docs/reference/configuration
+# the master in source-branches refers to the hardcoded internal master 
+# NOT THE BRANCH NAME
+# the branch name is in the regex: !!!!!
+mode: ContinuousDelivery
+next-version: 13.3.0
+major-version-bump-message: '(breaking\schange|breaking|major)\b'
+minor-version-bump-message: '(adds?|features?|minor)\b'
+patch-version-bump-message: '\s?(fix|patch)'
+no-bump-message: '\+semver:\s?(none|skip)'
+assembly-informational-format: '{NuGetVersionV2}+Sha.{Sha}.Date.{CommitDate}'
+branches:
+  master:
+    tag: preview
+    regex: ^main$
+  pull-request:
+    tag: PR 
+  feature:
+    tag: useBranchName
+    increment: Minor
+    regex: f(eature(s)?)?[\/-]
+    source-branches: ['master']
+  hotfix:
+    tag: fix
+    increment: Patch
+    regex: (hot)?fix(es)?[\/-]
+    source-branches: ['master']
+
+ignore:
+  sha: []
+merge-message-formats: {}
