@@ -3,7 +3,7 @@
 # NOT THE BRANCH NAME
 # the branch name is in the regex: !!!!!
 mode: ContinuousDelivery
-next-version: 13.3.0
+next-version: 1.1.0
 major-version-bump-message: '(breaking\schange|breaking|major)\b'
 minor-version-bump-message: '(adds?|features?|minor)\b'
 patch-version-bump-message: '\s?(fix|patch)'
