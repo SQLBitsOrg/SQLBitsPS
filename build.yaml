@@ -138,6 +138,14 @@ TaskHeader: |
   Write-Build DarkGray "  $($Task.InvocationInfo.ScriptName):$($Task.InvocationInfo.ScriptLineNumber)"
   ""
 
-
+####################################################
+#               GitHub Configuration               #
+####################################################
+GitHubConfig:
+  GitHubFilesToAdd:
+    - 'CHANGELOG.md'
+  GitHubConfigUserName: BeardAutoBot
+  GitHubConfigUserEmail: mrrobsewell@outlook.com
+  UpdateChangelogOnPrerelease: true
 
 
