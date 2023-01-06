@@ -7,8 +7,11 @@ function Get-SQLBitsSchedule {
     .DESCRIPTION
         Gets the SQLBits Schedule from the Sessionize API and outputs to json, excel, psobject, html or csv
 
-    .PARAMETER Output
+    .PARAMETER output
         The type of output required. Valid values are json, excel, psobject, html or csv
+
+    .PARAMETER speaker
+        A wild card search for a speaker
 
     .PARAMETER fileDirectory
         The directory to save the output file to - defaults to Env:Temp
@@ -17,29 +20,39 @@ function Get-SQLBitsSchedule {
         Whether to open the output file after it has been created
 
     .EXAMPLE
-        Get-SQLBitsSchedule  -Output Excel -Show
+        Get-SQLBitsSchedule  -output Excel -Show
 
         Gets the SQLBits Schedule from the Sessionize API and outputs to excel, opens the file and saves it to the default temp directory
 
     .EXAMPLE
-        Get-SQLBitsSchedule  -Output Raw
+        Get-SQLBitsSchedule  -output Raw
 
         Gets the SQLBits Schedule from the Sessionize API and outputs as json on the screen
 
     .EXAMPLE
-        Get-SQLBitsSchedule  -Output csv -Show
+        Get-SQLBitsSchedule  -output csv -Show
 
         Gets the SQLBits Schedule from the Sessionize API and outputs to csv, opens the file and saves it to the default temp directory
 
     .EXAMPLE
-        Get-SQLBitsSchedule  -Output object
+        Get-SQLBitsSchedule  -output object
 
         Gets the SQLBits Schedule from the Sessionize API and outputs as a psobject on the screen
 
     .EXAMPLE
-        Get-SQLBitsSchedule  -Output html -Show
+        Get-SQLBitsSchedule  -output html -Show
 
         Gets the SQLBits Schedule from the Sessionize API and outputs to html, opens the file and saves it to the default temp directory
+
+    .EXAMPLE
+        Get-SQLBitsSchedule -speaker Buck -output object | ft
+
+            Day StartTime EndTime Room        speakers   Session
+            --- --------- ------- ----        --------   -------
+        Thursday 14:10     15:00   MR 1B       Buck Woody Arc, Arc and Arc: De-mystifying Azure Arc for Data…
+        Friday 12:00     12:50   Expo Room 2 Buck Woody The Microsoft Intelligent Data Platform…
+
+        Gets the SQLBits Schedule from the Sessionize API searches fro Buck and outputs an object
 
     .NOTES
         Author: Rob Sewell
@@ -49,13 +62,13 @@ function Get-SQLBitsSchedule {
     param (
         [Parameter()]
         [ValidateSet('raw', 'excel', 'object', 'csv', 'html')]
-        $Output = 'excel',
+        $output = 'excel',
         [string]
         $speaker,
         [string]
         $fileDirectory = $env:TEMP,
         [switch]
-        $Show
+        $show
     )
 
     $BaseUri = 'https://sessionize.com/api/v2/u1qovn3p/view'
@@ -73,7 +86,7 @@ function Get-SQLBitsSchedule {
         'Sessions' {
             $uri = '{0}/sessions' -f $BaseUri
         }
-        'Speakers' {
+        'speakers' {
             $uri = '{0}/speakers' -f $BaseUri
         }
         Default {
@@ -92,9 +105,9 @@ function Get-SQLBitsSchedule {
         Write-Warning 'No rooms returned from Sessionize API'
         return
     }
-    $Speakers = $data.speakers
-    if (-not $Speakers) {
-        Write-Warning 'No Speakers returned from Sessionize API'
+    $speakers = $data.speakers
+    if (-not $speakers) {
+        Write-Warning 'No speakers returned from Sessionize API'
         return
     }
     # Thank you Shane - https://nocolumnname.blog/2020/10/29/pivot-in-powershell/
@@ -111,7 +124,7 @@ function Get-SQLBitsSchedule {
                     '{0}
 {1}'  -f @(
                         ($Psitem.Group | Where-Object { $PSItem.roomID -eq $room.id }).title,
-                        (($Psitem.Group | Where-Object { $PSItem.roomID -eq $room.id }).Speakers.ForEach{ $Speakers | Where-Object id -EQ $_ }.FullName -join ' ')
+                        (($Psitem.Group | Where-Object { $PSItem.roomID -eq $room.id }).speakers.ForEach{ $speakers | Where-Object id -EQ $_ }.FullName -join ' ')
                     )
 
                 }.GetNewClosure()
@@ -129,16 +142,16 @@ function Get-SQLBitsSchedule {
     # if we have a speaker filter, filter the sessions
     if ($speaker) {
         $Results = @{Name = 'Results'; Expression = {
-                $_.psobject.properties.Value -like "*$Speaker*" 
+                $_.psobject.properties.Value -like "*$speaker*" 
             }
         }
         $RoomSearch = @{Name = 'Room'; Expression = {
-            ($_.psobject.properties | Where-Object { $_.Value -like "*$Speaker*" } ).Name
+            ($_.psobject.properties | Where-Object { $_.Value -like "*$speaker*" } ).Name
             }
         }
-        $SpeakerSearch = @{Name = 'Speakers'; Expression = { ($_.Results -Split "`n")[1] } }
+        $speakerSearch = @{Name = 'speakers'; Expression = { ($_.Results -Split "`n")[1] } }
         $Session = @{Name = 'Session'; Expression = { ($_.Results -Split "`n")[0] } }
-        $sessions = $sessions | Select-Object -Property *, $RoomSearch, $Results | Where-Object { $null -ne $_.Results } | Select-Object -Property Day, StartTime, EndTime, Room, $SpeakerSearch, $Session
+        $sessions = $sessions | Select-Object -Property *, $RoomSearch, $Results | Where-Object { $null -ne $_.Results } | Select-Object -Property Day, StartTime, EndTime, Room, $speakerSearch, $Session
     }
     
 
@@ -180,7 +193,7 @@ function Get-SQLBitsSchedule {
                     if ($Show) {
                         Invoke-Item $filepath
                     } else {
-                        Write-Output "Excel file saved to $FilePath"
+                        Write-output "Excel file saved to $FilePath"
                     }
                 }
             } else {
@@ -190,7 +203,7 @@ function Get-SQLBitsSchedule {
                 if ($Show) {
                     Invoke-Item $filepath
                 } else {
-                    Write-Output "Csv file saved to $FilePath"
+                    Write-output "Csv file saved to $FilePath"
                 }
             }
 
@@ -201,7 +214,7 @@ function Get-SQLBitsSchedule {
             if ($Show) {
                 Invoke-Item $filepath
             } else {
-                Write-Output "Csv file saved to $FilePath"
+                Write-output "Csv file saved to $FilePath"
             }
         }
         'html' {
@@ -210,7 +223,7 @@ function Get-SQLBitsSchedule {
             if ($Show) {
                 Invoke-Item $filepath
             } else {
-                Write-Output "Html file saved to $FilePath"
+                Write-output "Html file saved to $FilePath"
             }
         }
         Default {
