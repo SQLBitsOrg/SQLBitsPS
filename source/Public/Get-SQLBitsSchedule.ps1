@@ -51,6 +51,8 @@ function Get-SQLBitsSchedule {
         [ValidateSet('raw', 'excel', 'object', 'csv', 'html')]
         $Output = 'excel',
         [string]
+        $speaker,
+        [string]
         $fileDirectory = $env:TEMP,
         [switch]
         $Show
@@ -81,17 +83,17 @@ function Get-SQLBitsSchedule {
 
     $Data = Invoke-RestMethod -Uri $uri
 
-    if(-not $Data){
+    if (-not $Data) {
         Write-Warning 'No data returned from Sessionize API'
         return
     }
     $rooms = ($data.rooms | Sort-Object name)
-    if(-not $rooms){
+    if (-not $rooms) {
         Write-Warning 'No rooms returned from Sessionize API'
         return
     }
     $Speakers = $data.speakers
-    if(-not $Speakers){
+    if (-not $Speakers) {
         Write-Warning 'No Speakers returned from Sessionize API'
         return
     }
@@ -116,13 +118,29 @@ function Get-SQLBitsSchedule {
             }
         }
     )
-    if($IsCoreCLR){
+    if ($IsCoreCLR) {
         $rawsessions = $Data.sessions 
     } else {
-        $rawsessions = $Data.sessions | Select -Property id, title,@{Name = 'startsAt';expression = {[datetime]$_.startsAt}} , @{Name = 'endsAt';expression = {[datetime]$_.endsAt}}, roomID, speakers
+        $rawsessions = $Data.sessions | select -Property id, title, @{Name = 'startsAt'; expression = { [datetime]$_.startsAt } } , @{Name = 'endsAt'; expression = { [datetime]$_.endsAt } }, roomID, speakers
 
     }
     $sessions = $rawsessions | Group-Object -Property StartsAt | Select-Object $props
+
+    # if we have a speaker filter, filter the sessions
+    if ($speaker) {
+        $Results = @{Name = 'Results'; Expression = {
+                $_.psobject.properties.Value -like "*$Speaker*" 
+            }
+        }
+        $RoomSearch = @{Name = 'Room'; Expression = {
+            ($_.psobject.properties | Where-Object { $_.Value -like "*$Speaker*" } ).Name
+            }
+        }
+        $SpeakerSearch = @{Name = 'Speakers'; Expression = { ($_.Results -Split "`n")[1] } }
+        $Session = @{Name = 'Session'; Expression = { ($_.Results -Split "`n")[0] } }
+        $sessions = $sessions | Select-Object -Property *, $RoomSearch, $Results | Where-Object { $null -ne $_.Results } | Select-Object -Property Day, StartTime, EndTime, Room, $SpeakerSearch, $Session
+    }
+    
 
     switch ($output) {
         'Raw' {
@@ -161,7 +179,7 @@ function Get-SQLBitsSchedule {
                     }
                     if ($Show) {
                         Invoke-Item $filepath
-                    }else {
+                    } else {
                         Write-Output "Excel file saved to $FilePath"
                     }
                 }
@@ -171,7 +189,7 @@ function Get-SQLBitsSchedule {
                 $sessions | Sort-Object Day, StartsAt | Export-Csv -Path $FilePath -NoTypeInformation
                 if ($Show) {
                     Invoke-Item $filepath
-                }else {
+                } else {
                     Write-Output "Csv file saved to $FilePath"
                 }
             }
@@ -182,18 +200,18 @@ function Get-SQLBitsSchedule {
             $sessions | Sort-Object Day, StartsAt | Export-Csv -Path $FilePath -NoTypeInformation
             if ($Show) {
                 Invoke-Item $filepath
-            }else {
+            } else {
                 Write-Output "Csv file saved to $FilePath"
             }
         }
         'html' {
             $FilePath = '{0}\SQLBits_{1}_{2}.html' -f $fileDirectory, $filter, $Date
-            $sessions | ConvertTo-Html | out-file $FilePath
-                if ($Show) {
-                    Invoke-Item $filepath
-                }else {
-                    Write-Output "Html file saved to $FilePath"
-                }
+            $sessions | ConvertTo-Html | Out-File $FilePath
+            if ($Show) {
+                Invoke-Item $filepath
+            } else {
+                Write-Output "Html file saved to $FilePath"
+            }
         }
         Default {
 
