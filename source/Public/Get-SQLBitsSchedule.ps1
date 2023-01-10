@@ -11,7 +11,7 @@ function Get-SQLBitsSchedule {
         The type of output required. Valid values are json, excel, psobject, html or csv
 
     .PARAMETER search
-        A wild card search beat used to find a speaker
+        A wild card search best used to find a speaker
 
     .PARAMETER fileDirectory
         The directory to save the output file to - defaults to Env:Temp
