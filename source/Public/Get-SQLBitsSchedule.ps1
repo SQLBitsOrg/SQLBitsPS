@@ -10,8 +10,8 @@ function Get-SQLBitsSchedule {
     .PARAMETER output
         The type of output required. Valid values are json, excel, psobject, html or csv
 
-    .PARAMETER speaker
-        A wild card search for a speaker
+    .PARAMETER search
+        A wild card search beat used to find a speaker
 
     .PARAMETER fileDirectory
         The directory to save the output file to - defaults to Env:Temp
@@ -45,7 +45,7 @@ function Get-SQLBitsSchedule {
         Gets the SQLBits Schedule from the Sessionize API and outputs to html, opens the file and saves it to the default temp directory
 
     .EXAMPLE
-        Get-SQLBitsSchedule -speaker Buck -output object | ft
+        Get-SQLBitsSchedule -search Buck -output object | ft
 
             Day StartTime EndTime Room        speakers   Session
             --- --------- ------- ----        --------   -------
@@ -64,7 +64,7 @@ function Get-SQLBitsSchedule {
         [ValidateSet('raw', 'excel', 'object', 'csv', 'html')]
         $output = 'excel',
         [string]
-        $speaker,
+        $search,
         [string]
         $fileDirectory = $env:TEMP,
         [switch]
@@ -139,14 +139,14 @@ function Get-SQLBitsSchedule {
     }
     $sessions = $rawsessions | Group-Object -Property StartsAt | Select-Object $props
 
-    # if we have a speaker filter, filter the sessions
-    if ($speaker) {
+    # if we have a search filter, filter the sessions
+    if ($search) {
         $Results = @{Name = 'Results'; Expression = {
-                $_.psobject.properties.Value -like "*$speaker*" 
+                $_.psobject.properties.Value -like "*$search*" 
             }
         }
         $RoomSearch = @{Name = 'Room'; Expression = {
-            ($_.psobject.properties | Where-Object { $_.Value -like "*$speaker*" } ).Name
+            ($_.psobject.properties | Where-Object { $_.Value -like "*$search*" } ).Name
             }
         }
         $speakerSearch = @{Name = 'speakers'; Expression = { ($_.Results -Split "`n")[1] } }
