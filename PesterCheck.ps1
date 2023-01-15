@@ -1,7 +1,15 @@
 # Validates the Sessionize schedule against the Speaker Requests
 
 BeforeDiscovery {
-    $file = 'G:\SQLBits Limited (O365)\SQLBits portal - Shared Documents\2023\Speakers\SpeakerRequests.xlsx'
+
+    switch ($env:computername) {
+        'BEARD-DESKTOP' {
+            $file = 'G:\SQLBits Limited (O365)\SQLBits portal - Shared Documents\2023\Speakers\SpeakerRequests.xlsx'
+        }
+        'BEARD-SURFACELA' {
+            $file = 'C:\Users\mrrob\SQLBits Limited (O365)\SQLBits portal - 2023\Speakers\SpeakerRequests.xlsx'
+        }
+    }
     $SpeakerRequests = Import-Excel -Path $file -WorksheetName SpeakerRequests
 
     $Schedule = Get-SQLBitsSchedule -Output object
@@ -15,6 +23,34 @@ BeforeDiscovery {
     $Thursday = $Checking | Where-Object Day -EQ 'Thursday'
     $Friday = $Checking | Where-Object Day -EQ 'Friday'
     $Saturday = $Checking | Where-Object Day -EQ 'Saturday'
+    $SponsoredRoom1Name = 'MR 2E'
+    $SponsoredRoom2Name = 'MR 4'
+    $SponsoredRoom1Sessions = @{
+        Name = 'Sponsored Room Session 1'
+        Room = $SponsoredRoom1Name
+    },@{
+        Name = 'Sponsored Room Session 2'
+        Room = $SponsoredRoom1Name
+    },@{
+        Name = 'Sponsored Room Session 3'
+        Room = $SponsoredRoom1Name
+    },@{
+        Name = 'Sponsored Room Session 4'
+        Room = $SponsoredRoom1Name
+    },@{
+        Name = 'Sponsored Room Session 5'
+        Room = $SponsoredRoom1Name
+    },@{
+        Name = 'Sponsored Room Session 6'
+        Room = $SponsoredRoom1Name
+    },@{
+        Name = 'Sponsored Room Session 7'
+        Room = $SponsoredRoom2Name
+    },@{
+        Name = 'Sponsored Room Session 8'
+        Room = $SponsoredRoom2Name
+    }
+
 }
 
 Describe "Ensuring <_.'Speaker Name'> available days are granted" -ForEach ($SpeakerRequests | where Available -NE 0) {
@@ -91,3 +127,10 @@ Describe "Ensuring <_.'Speaker Name'> unavailable days AM and PM are granted" -F
         }
 
     }
+
+Describe "Ensuring Sponsor sessions are in the correct room" {
+    It "The session <_.Name> should be in the correct room <_.Room>" -ForEach $SponsoredRoom1Sessions  {
+
+        (Get-SQLBitsSchedule -output object -search $Psitem.Name).Room | Should -Be $Psitem.Room   -Because "The session $($Psitem.Name) should be in the correct room $($Psitem.Room)  "
+    }
+}
