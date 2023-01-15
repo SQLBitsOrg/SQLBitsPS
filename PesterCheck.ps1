@@ -12,7 +12,8 @@ BeforeDiscovery {
     }
     $SpeakerRequests = Import-Excel -Path $file -WorksheetName SpeakerRequests
 
-    $Schedule = Get-SQLBitsSchedule -Output object
+    $Schedule = Get-SQLBitsSchedule -output object
+    $ScheduleSearch = Get-SQLBitsSchedule -output object -search *
     $plenarysessions = 'Registration', 'Quick Break', 'Closing Keynote and Prize Giving', 'End - TearDown', 'Coffee Break', 'Lunch', 'Free Time', 'Prize Giving', 'Party', 'Pub Quiz', 'Keynote by The Community'
 
     $Rooms = ($Schedule[0].psobject.properties | Where-Object { $_.Name -notin 'Day', 'Date', 'StartTime', 'EndTime', 'All Rooms' }).Name
@@ -24,33 +25,39 @@ BeforeDiscovery {
     $Friday = $Checking | Where-Object Day -EQ 'Friday'
     $Saturday = $Checking | Where-Object Day -EQ 'Saturday'
     $SponsoredRoom1Name = 'MR 2E'
-    $SponsoredRoom2Name = 'MR 4'
+    $SponsoredRoom2Name = 'MR 3E'
     $SponsoredRoom1Sessions = @{
         Name = 'Sponsored Room Session 1'
         Room = $SponsoredRoom1Name
-    },@{
+    }, @{
         Name = 'Sponsored Room Session 2'
         Room = $SponsoredRoom1Name
-    },@{
+    }, @{
         Name = 'Sponsored Room Session 3'
         Room = $SponsoredRoom1Name
-    },@{
+    }, @{
         Name = 'Sponsored Room Session 4'
         Room = $SponsoredRoom1Name
-    },@{
+    }, @{
         Name = 'Sponsored Room Session 5'
         Room = $SponsoredRoom1Name
-    },@{
+    }, @{
         Name = 'Sponsored Room Session 6'
         Room = $SponsoredRoom1Name
-    },@{
+    }, @{
         Name = 'Sponsored Room Session 7'
         Room = $SponsoredRoom2Name
-    },@{
+    }, @{
         Name = 'Sponsored Room Session 8'
         Room = $SponsoredRoom2Name
     }
 
+    $AllSpeakers = Get-SQLBitsSpeakers -full
+    $RemoteRoom = 'MR 4'
+}
+BeforeAll {
+    $Schedule = Get-SQLBitsSchedule -output object
+    $RemoteRoom = 'MR 4'
 }
 
 Describe "Ensuring <_.'Speaker Name'> available days are granted" -ForEach ($SpeakerRequests | where Available -NE 0) {
@@ -80,7 +87,6 @@ Describe "Ensuring <_.'Speaker Name'> available days AM and PM are granted" -For
         It "The Speaker $SpeakerName's session starting at <_.StartTime> on <_.Day> should be on the correct day $Available " -ForEach (($Checking | where Speakers -Like "*$SpeakerName*" )) {
             ([datetime]$Psitem.StartTime).Hour | Should -BeLessThan 13  -Because "The Speaker $SpeakerName should be in the AM"
             $Available.ToUpper().Replace('AM', '').Replace('PM', '').Replace(' ', '') | Should -BeLike "*$($PsItem.day.ToString().ToUpper())*"  -Because "The Speaker $SpeakerName should be on the correct day $Available "
-           
         }
     }
     Context "Should be PM" -ForEach ($Available | Where-Object { $_ -like '*PM*' } ) {
@@ -106,7 +112,7 @@ Describe "Ensuring <_.'Speaker Name'> unavailable wishes are granted" -ForEach (
     }
 }
 
-Describe "Ensuring <_.'Speaker Name'> unavailable days AM and PM are granted" -ForEach ( $SpeakerRequests| Where-Object { ($_.'Not Available' -like '*AM*') -or ($_.'Not Available' -like '*PM*') }) {
+Describe "Ensuring <_.'Speaker Name'> unavailable days AM and PM are granted" -ForEach ( $SpeakerRequests | Where-Object { ($_.'Not Available' -like '*AM*') -or ($_.'Not Available' -like '*PM*') }) {
     BeforeDiscovery {
         $NotAvailable = $Psitem.'Not Available'
         $SpeakerName = $Psitem.'Speaker Name'
@@ -116,21 +122,29 @@ Describe "Ensuring <_.'Speaker Name'> unavailable days AM and PM are granted" -F
         $SpeakerName = $Psitem.'Speaker Name'
     }
     Context "Should NOT be AM" -ForEach ($NotAvailable | Where-Object { $_ -like '*AM*' } ) {
-        It "The Speaker $SpeakerName's session starting at <_.StartTime> on <_.Day> should be on the correct day $NotAvailable and time" -ForEach (($Checking | Where-Object { $_.Speakers -Like "*$SpeakerName*" -and $_.Day -eq $NotAvailable.ToUpper().Replace('AM', '').Replace('PM', '').Replace(' ', '')  })) {
+        It "The Speaker $SpeakerName's session starting at <_.StartTime> on <_.Day> should be on the correct day $NotAvailable and time" -ForEach (($Checking | Where-Object { $_.Speakers -Like "*$SpeakerName*" -and $_.Day -eq $NotAvailable.ToUpper().Replace('AM', '').Replace('PM', '').Replace(' ', '') })) {
             ([datetime]$Psitem.StartTime).Hour | Should -BeGreaterThan 12  -Because "The Speaker $SpeakerName should not be in the AM"
-            }
         }
-        Context "Should NOT be PM" -ForEach ($NotAvailable | Where-Object { $_ -like '*PM*' } ) {
-            It "The Speaker $SpeakerName's session starting at <_.StartTime> on <_.Day> should be on the correct day $NotAvailable and time" -ForEach (($Checking | Where-Object { $_.Speakers -Like "*$SpeakerName*" -and $_.Day -eq $NotAvailable.ToUpper().Replace('AM', '').Replace('PM', '').Replace(' ', '') } )) {
+    }
+    Context "Should NOT be PM" -ForEach ($NotAvailable | Where-Object { $_ -like '*PM*' } ) {
+        It "The Speaker $SpeakerName's session starting at <_.StartTime> on <_.Day> should be on the correct day $NotAvailable and time" -ForEach (($Checking | Where-Object { $_.Speakers -Like "*$SpeakerName*" -and $_.Day -eq $NotAvailable.ToUpper().Replace('AM', '').Replace('PM', '').Replace(' ', '') } )) {
             ([datetime]$Psitem.StartTime).Hour | Should -BeLessThan 13  -Because "The Speaker $SpeakerName should not be in the PM"
-            }
         }
-
     }
 
-Describe "Ensuring Sponsor sessions are in the correct room" {
-    It "The session <_.Name> should be in the correct room <_.Room>" -ForEach $SponsoredRoom1Sessions  {
+}
 
-        (Get-SQLBitsSchedule -output object -search $Psitem.Name).Room | Should -Be $Psitem.Room   -Because "The session $($Psitem.Name) should be in the correct room $($Psitem.Room)  "
+Describe "Ensuring Sponsor sessions are in the correct room" {
+    It "The session <_.Name> should be in the correct room <_.Room>" -ForEach $SponsoredRoom1Sessions {
+       (Get-SQLBitsSchedule -output object -search $Psitem.Name).Room | Should -Be $Psitem.Room   -Because "The session $($Psitem.Name) should be in the correct room $($Psitem.Room)  "
+    }
+}
+
+Describe "All the remote speakers should be in the correct room" {
+    Context "<_.FullName> remote speaker" -ForEach ($AllSpeakers | Where-Object { $_.Remote -eq 'Remote' }) {
+
+        It "The Session <_.Name> in <_.Room> should be in the correct room $RemoteRoom " -ForEach ($Psitem.SessionNames){
+            $Psitem.Room | Should -Be $RemoteRoom   -Because "The session $($Psitem.Name) should be in the correct room $($Psitem.Room)"
+        }
     }
 }
