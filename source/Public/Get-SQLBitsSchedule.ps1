@@ -193,7 +193,7 @@ function Get-SQLBitsSchedule {
                     if ($Show) {
                         Invoke-Item $filepath
                     } else {
-                        Write-output "Excel file saved to $FilePath"
+                        Write-Output "Excel file saved to $FilePath"
                     }
                 }
             } else {
@@ -203,7 +203,7 @@ function Get-SQLBitsSchedule {
                 if ($Show) {
                     Invoke-Item $filepath
                 } else {
-                    Write-output "Csv file saved to $FilePath"
+                    Write-Output "Csv file saved to $FilePath"
                 }
             }
 
@@ -214,7 +214,7 @@ function Get-SQLBitsSchedule {
             if ($Show) {
                 Invoke-Item $filepath
             } else {
-                Write-output "Csv file saved to $FilePath"
+                Write-Output "Csv file saved to $FilePath"
             }
         }
         'html' {
@@ -223,11 +223,10 @@ function Get-SQLBitsSchedule {
             if ($Show) {
                 Invoke-Item $filepath
             } else {
-                Write-output "Html file saved to $FilePath"
+                Write-Output "Html file saved to $FilePath"
             }
         }
         Default {
-
         }
     }
 }
