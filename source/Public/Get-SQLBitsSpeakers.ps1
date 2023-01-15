@@ -56,6 +56,8 @@ function Get-SQLBitsSpeakers {
         $BaseUri = 'https://sessionize.com/api/v2/u1qovn3p/view'
         $Date = Get-Date -Format 'yyyy-MM-dd-HH-mm-ss'
         $uri = '{0}/speakers' -f $BaseUri
+        $sessionuri = '{0}/sessions' -f $BaseUri
+        $AllSessions = Invoke-RestMethod -Uri $sessionuri
         
         $CompanyName = @{Name='CompanyName';Expression={($_.questionAnswers | Where-Object {$_.id -eq 43369}).Answer}}
         $LinkedIn = @{Name='LinkedIn';Expression={($_.links | Where-Object {$_.linktype -eq 'LinkedIn'}).url}}
@@ -65,7 +67,16 @@ function Get-SQLBitsSpeakers {
         $Twitter = @{Name='Twitter';Expression={($_.links | Where-Object {$_.linktype -eq 'Twitter'}).url}}
         $CompanyWebsite = @{Name='Company Website';Expression={($_.links | Where-Object {$_.linktype -eq 'Company Website'}).url}}
         $Other = @{Name='Other';Expression={($_.links | Where-Object {$_.linktype -eq 'Other'}) | ForEach-Object { $_ }}}
-        $SessionNames = @{Name='SessionNames';Expression={($_.sessions | ForEach-Object { $_.name })}}
+        $SessionNames = @{
+            Name='SessionNames';Expression={$_.sessions | ForEach-Object {
+                $id = $_.id
+                [PSCustomObject]@{
+                    Name = $_.name
+                    Room = ($AllSessions.Sessions|Where-Object{$_.id -eq $id}).Room
+                }
+            }
+        }
+    }
         $Data = Invoke-RestMethod -Uri $uri 
         $Data = $Data|Select-Object *,$CompanyName,$Isremote,$LinkedIn,$Sessionize,$Blog,$Facebook,$Twitter,$CompanyWebsite,$Other,$sessionNames
         if (-not $Data) {
