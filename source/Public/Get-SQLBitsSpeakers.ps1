@@ -92,7 +92,7 @@ function Get-SQLBitsSpeakers {
             $Data = $Data | Where-Object { $_.fullName -like "*$search*" } 
         }
         if($remote) {
-            $Data = $Data | Where-Object { $_.Remote -eq 'Remote' }
+            $Data = $Data | Where-Object { $_.IsRemote -eq 'Remote' }
         }
         if($full) {
             $Data | Select-Object -ExcludeProperty id,isTopSpeaker,questionAnswers,categories,links
