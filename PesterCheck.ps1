@@ -144,7 +144,7 @@ Describe "Ensuring Sponsor sessions are in the correct room" {
 }
 
 Describe "All the remote speakers should be in the correct room" {
-    Context "<_.FullName> remote speaker" -ForEach ($AllSpeakers | Where-Object { $_.IsRemote -eq 'Remote' }) {
+    Context "<_.FullName> remote speaker" -ForEach ($AllSpeakers | Where-Object { $_.isRemote -eq 'Remote' }) {
 
         It "The Session <_.Name> in <_.Room> should be in the correct room $RemoteRoom " -ForEach ($Psitem.SessionNames){
             $Psitem.Room | Should -Be $RemoteRoom   -Because "The session $($Psitem.Name) should be in the correct room $($Psitem.Room)"

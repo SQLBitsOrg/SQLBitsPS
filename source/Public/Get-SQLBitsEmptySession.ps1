@@ -75,7 +75,8 @@ function Get-SQLBitsEmptySession {
             $rawOutput
         }
         'Grouped' {
-            $rawOutput | Group-Object Day | Select-Object Name, Count 
+            $Summary = @{Name='EmptySessions';Expression={($_.Group | Measure-Object -Property EmptySessions -Sum).Sum}}
+            $rawOutput | Group-Object Day | Select-Object Name, $Summary
         }
         'Total' {
             ($rawOutput | Measure-Object -Property EmptySessions -Sum).Sum

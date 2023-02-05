@@ -59,6 +59,8 @@ function Get-SQLBitsSpeakers {
         $sessionuri = '{0}/sessions' -f $BaseUri
         $AllSessions = Invoke-RestMethod -Uri $sessionuri
         
+        $Isremote = @{Name='IsRemote';Expression={($_.categories | Where-Object {$_.id -eq '44351';}).categoryItems.name}}
+        
         $CompanyName = @{Name='CompanyName';Expression={($_.questionAnswers | Where-Object {$_.id -eq 43369}).Answer}}
         $LinkedIn = @{Name='LinkedIn';Expression={($_.links | Where-Object {$_.linktype -eq 'LinkedIn'}).url}}
         $Sessionize = @{Name='Sessionize';Expression={($_.links | Where-Object {$_.linktype -eq 'Sessionize'}).url}}
@@ -90,7 +92,7 @@ function Get-SQLBitsSpeakers {
             $Data = $Data | Where-Object { $_.fullName -like "*$search*" } 
         }
         if($remote) {
-            $Data = $Data | Where-Object { $_.Remote -eq 'Remote' }
+            $Data = $Data | Where-Object { $_.IsRemote -eq 'Remote' }
         }
         if($full) {
             $Data | Select-Object -ExcludeProperty id,isTopSpeaker,questionAnswers,categories,links
