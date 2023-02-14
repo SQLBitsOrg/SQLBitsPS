@@ -2,12 +2,15 @@
 
 BeforeDiscovery {
 
-    switch ($env:computername) {
-        'BEARD-DESKTOP' {
-            $file = 'G:\SQLBits Limited (O365)\SQLBits portal - Shared Documents\2023\Speakers\SpeakerRequests.xlsx'
-        }
-        'BEARD-SURFACELA' {
-            $file = 'C:\Users\mrrob\SQLBits Limited (O365)\SQLBits portal - 2023\Speakers\SpeakerRequests.xlsx'
+        switch ($env:computername) {
+            'BEARD-DESKTOP1' {
+                $file = 'G:\SQLBits Limited (O365)\SQLBits portal - Shared Documents\2023\Speakers\SpeakerRequests.xlsx'
+            }
+            'BEARD-SURFACELA1' {
+                $file = 'C:\Users\mrrob\SQLBits Limited (O365)\SQLBits portal - 2023\Speakers\SpeakerRequests.xlsx'
+            }
+            default {
+                $file = Read-Host -Prompt 'Please enter the full path to the SpeakerRequests.xlsx file'
         }
     }
     $SpeakerRequests = Import-Excel -Path $file -WorksheetName SpeakerRequests
@@ -146,7 +149,7 @@ Describe "Ensuring Sponsor sessions are in the correct room" {
 Describe "All the remote speakers should be in the correct room" {
     Context "<_.FullName> remote speaker" -ForEach ($AllSpeakers | Where-Object { $_.isRemote -eq 'Remote' }) {
 
-        It "The Session <_.Name> in <_.Room> should be in the correct room $RemoteRoom " -ForEach ($Psitem.SessionNames){
+        It "The Session <_.Name> in <_.Room> should be in the correct room $RemoteRoom " -ForEach ($Psitem.SessionNames) {
             $Psitem.Room | Should -Be $RemoteRoom   -Because "The session $($Psitem.Name) should be in the correct room $($Psitem.Room)"
         }
     }
