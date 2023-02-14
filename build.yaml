@@ -71,7 +71,7 @@ Pester:
   #  - FunctionalQuality
   #  - TestQuality
   Tag:
-  CodeCoverageThreshold: 0 # Set to 0 to bypass
+  CodeCoverageThreshold: 1 # Set to 0 to bypass
 
 
 # Import ModuleBuilder tasks from a specific PowerShell module using the build
