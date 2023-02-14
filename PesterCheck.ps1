@@ -2,15 +2,15 @@
 
 BeforeDiscovery {
 
-        switch ($env:computername) {
-            'BEARD-DESKTOP1' {
-                $file = 'G:\SQLBits Limited (O365)\SQLBits portal - Shared Documents\2023\Speakers\SpeakerRequests.xlsx'
-            }
-            'BEARD-SURFACELA1' {
-                $file = 'C:\Users\mrrob\SQLBits Limited (O365)\SQLBits portal - 2023\Speakers\SpeakerRequests.xlsx'
-            }
-            default {
-                $file = Read-Host -Prompt 'Please enter the full path to the SpeakerRequests.xlsx file'
+    switch ($env:computername) {
+        'BEARD-DESKTOP' {
+            $file = 'G:\SQLBits Limited (O365)\SQLBits portal - Shared Documents\2023\Speakers\SpeakerRequests.xlsx'
+        }
+        'BEARD-SURFACELA1' {
+            $file = 'C:\Users\mrrob\SQLBits Limited (O365)\SQLBits portal - 2023\Speakers\SpeakerRequests.xlsx'
+        }
+        default {
+            $file = Read-Host -Prompt 'Please enter the full path to the SpeakerRequests.xlsx file'
         }
     }
     $SpeakerRequests = Import-Excel -Path $file -WorksheetName SpeakerRequests
@@ -48,15 +48,18 @@ BeforeDiscovery {
         Name = 'Sponsored Room Session 6'
         Room = $SponsoredRoom1Name
     }, @{
-        Name = 'Sponsored Room Session 7'
+        Name = 'Power BI governance, disaster recovery and auditing'
         Room = $SponsoredRoom2Name
     }, @{
-        Name = 'Sponsored Room Session 8'
+        Name = 'Understanding and Managing Data Lineage in Power BI'
         Room = $SponsoredRoom2Name
     }, @{
         Name = 'Power Bi Composite and Hybrid models'
         Room = $SponsoredRoom2Name
     }
+    $CommunityCorner = 'Community Corner'
+    $CommunityCornerTitles = 'Meet the PG: SQL Leadership', 'Meet the PG: Azure SQL Managed Instance', 'Meet the PG: SQL Server on Azure VMs', 'Meet the PG: Microsoft Purview ', 'Meet the PG: Just Use Extended Events Already with Erin Stellato', 'Meet the PG: Azure Synapse Analytics ', 'Meet the PG: Azure Arc enabled SQL Server / Arc SQL MI', 'Meet the PG: Azure SQL ', 'Meet the PG: SQL Server ', 'Meet the PG: Power BI '
+
 
     $AllSpeakers = Get-SQLBitsSpeakers -full
     $RemoteRoom = 'MR 4'
@@ -141,8 +144,24 @@ Describe "Ensuring <_.'Speaker Name'> unavailable days AM and PM are granted" -F
 }
 
 Describe "Ensuring Sponsor sessions are in the correct room" {
+
     It "The session <_.Name> should be in the correct room <_.Room>" -ForEach $SponsoredRoom1Sessions {
-       (Get-SQLBitsSchedule -output object -search $Psitem.Name).Room | Should -Be $Psitem.Room   -Because "The session $($Psitem.Name) should be in the correct room $($Psitem.Room)  "
+        $Name = $Psitem.Name
+        $Results = @{Name = 'Results'; Expression = {
+                $_.psobject.properties.Value -like "*$Name*"
+            }
+        }
+        (($Schedule  | Select-Object -Property *, $Results | Where-Object { $null -ne $_.Results }).psobject.properties | Where-Object { $_.Value -like "*$Name*" } )[0].Name| Should -Be $Psitem.Room   -Because "The session $($Psitem.Name) should be in the room $($Psitem.Room)"
+    }
+}
+
+Describe "Ensuring Community Corner sessions are in the correct room" {
+    It "The session <_> should be in the correct room" -ForEach $CommunityCornerTitles {
+        $Results = @{Name = 'Results'; Expression = {
+                $_.psobject.properties.Value -like "*$_*"
+            }
+        }
+        (($Schedule  | Select-Object -Property *, $Results | Where-Object { $null -ne $_.Results }).psobject.properties | Where-Object { $_.Value -like "*$_*" } )[0].Name| Should -Be $Psitem.Room -Because "The session $($Psitem.Name) should be in the Community Corner "
     }
 }
 
