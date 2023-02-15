@@ -2,7 +2,7 @@
 function Get-SQLBitsSession {
 <#
 .SYNOPSIS
-Gets the sessions from the Sessionize API
+Gets the sessions from the Sessionize API.
 
 .DESCRIPTION
 Gets all the sessions from the Sessionize API and outputs to json, excel, psobject, html or csv
