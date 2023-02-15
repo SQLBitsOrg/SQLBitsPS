@@ -3,9 +3,10 @@
 A module for gathering information about SQLBits agenda from Sessionize, tested on Windows, Mac and Linux for Windows PowerShell and pwsh
 
 
-[![.github/workflows/main.yml](https://github.com/SQLDBAWithABeard/SQLBitsPS/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/SQLDBAWithABeard/SQLBitsPS/actions/workflows/main.yml) 
+[![.github/workflows/main.yml](https://github.com/SQLDBAWithABeard/SQLBitsPS/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/SQLDBAWithABeard/SQLBitsPS/actions/workflows/main.yml)  
 [![GitHub release badge](https://badgen.net/github/release/SQLDBAWithABeard/SQLBitsPS/stable)](https://github.com/SQLDBAWithABeard/SQLBitsPS/releases/latest)
-[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/SQLBitsPS?label=SQLBitsPS)](https://www.powershellgallery.com/packages/SQLBitsPS/)  
+[![GitHub release badge](https://badgen.net/github/release/SQLDBAWithABeard/SQLBitsPS?label=pre-release)](https://github.com/SQLDBAWithABeard/SQLBitsPS/releases)  
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/SQLBitsPS?label=PowerShell%20Gallery)](https://www.powershellgallery.com/packages/SQLBitsPS/)  
 [![GitHub license badge](https://badgen.net/github/license/SQLDBAWithABeard/SQLBitsPS)](https://github.com/SQLDBAWithABeard/SQLBitsPS/blob/43423437f831e2844452d482a50864f224f12534/LICENSE)  
 [![GitHub releases badge](https://badgen.net/github/releases/SQLDBAWithABeard/SQLBitsPS)](https://github.com/SQLDBAWithABeard/SQLBitsPS/releases)  
 ![Ubuntu Linux](https://badgen.net/badge/icon/Ubuntu?icon=terminal&label)[![Linux Tests](https://gist.githubusercontent.com/SQLDBAWithABeard/b1fc4cba1712da56f2673c147f5787f2/raw/linux-badge.svg)](https://github.com/SQLDBAWithABeard/SQLBitsPS/actions/)  
