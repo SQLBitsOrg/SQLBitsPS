@@ -139,6 +139,9 @@ jobs:
         path: ${{ env.buildFolderName }}/${{ env.testResultFolderName }}/
         name: CodeCoverageMacOS
   Test_Stage_Code_Coverage:
+    permissions:
+      checks: write
+      pull-requests: write
     name: Publish Code Coverage
     runs-on: ubuntu-latest
     needs:
