@@ -2,15 +2,15 @@ function Get-SQLBitsEmptySession {
     <#
     .SYNOPSIS
     A helper function to get the number of empty sessions at SQLBits
-    
+
     .DESCRIPTION
     Just a helper function to get the number of empty sessions at SQLBits
-    
+
     .PARAMETER output
     The type of output required. Valid values are Raw(default), Grouped or Total
-    
+
     .EXAMPLE
-    Get-SQLBitsEmptySessionCount 
+    Get-SQLBitsEmptySessionCount
 
          Day StartTime EndTime EmptySessions
          --- --------- ------- -------------
@@ -41,27 +41,36 @@ function Get-SQLBitsEmptySession {
     10
 
     Returns the total number of empty sessions at SQLBits
-    
+
     .NOTES
     Rob Sewell 2023
     #>
     [cmdletbinding()]
     Param(
         [Parameter()]
-        [ValidateSet('Raw', 'Grouped', 'Total')]
+        [ValidateSet('Raw','Grouped', 'Total')]
         [string]
-        $output = 'Raw'
+        $output = 'Raw',
+        [Parameter()]
+        [switch]$excludeCommunityCorner,
+        [switch]$excludeZeros
     )
     $Schedule = Get-SQLBitsSchedule -output object
     $plenarysessions = 'Registration', 'Quick Break', 'Closing Keynote and Prize Giving', 'End - TearDown', 'Coffee Break', 'Lunch', 'Free Time', 'Prize Giving', 'Party', 'Pub Quiz', 'Keynote by The Community', 'End - TearDown'
     $KeyNotes = 'Keynote by The Community', 'Opening Keynote'
+    if($excludeCommunityCorner){
+        $sessionss =  $Schedule | Where-Object { $_.'All Rooms'.Trim() -notin $plenarysessions -and $_.Auditorium.Trim() -notlike '*The Kingdom of AdventureWorks Calls for Aid*' -and $_.Auditorium -notlike '*Keynote by The Community*'} | select * -ExcludeProperty 'All Rooms','Community Corner'
+    } else {
+        $sessionss = $Schedule | Where-Object {($_.'All Rooms'.Trim() -notin $plenarysessions ) -and  ($_.Auditorium.Trim() -notin $KeyNotes) -and ($_.Auditorium.Trim() -notlike '*The Kingdom of AdventureWorks Calls for Aid*') -and ($_.Auditorium -notlike '*Keynote by The Community*' )}| select * -ExcludeProperty 'All Rooms'
+    }
 
-    $rawOutput = foreach ($time in $Schedule | Where-Object { $_.'All Rooms'.Trim() -notin $plenarysessions -and $_.Auditorium.Trim() -notin $KeyNotes }) {
-        $SessionCount = ($time.psobject.Properties.Where{ $_.Name -ne 'All Rooms' }.Value -eq '
-' ).Count
+
+    $rawOutput = foreach ($time in $sessionss) {
+        $SessionCount = ($time.psobject.Properties.Where{$_.Value -eq '
+' }).Count
         $Message = "{0} {1} has {2} empty sessions" -f $time.Day, $time.StartTime, $SessionCount
         Write-PSFMessage $message -Level Verbose
-        
+
         [pscustomobject]@{
             Day           = $time.Day
             StartTime     = $time.StartTime
@@ -72,13 +81,23 @@ function Get-SQLBitsEmptySession {
 
     switch ($output) {
         'Raw' {
-            $rawOutput
+            if($excludeZeros){
+                $rawOutput | Where-Object { $_.EmptySessions -gt 0 }
+            } else {
+                $rawOutput
+            }
         }
         'Grouped' {
+            if($excludeZeros){
+                Write-Output "Can't exclude zeros when grouping"
+            }
             $Summary = @{Name='EmptySessions';Expression={($_.Group | Measure-Object -Property EmptySessions -Sum).Sum}}
             $rawOutput | Group-Object Day | Select-Object Name, $Summary
         }
         'Total' {
+            if($excludeZeros){
+                Write-Output "Can't exclude zeros when summing"
+            }
             ($rawOutput | Measure-Object -Property EmptySessions -Sum).Sum
         }
         Default {
