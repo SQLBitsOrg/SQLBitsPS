@@ -70,7 +70,7 @@ function Get-SQLBitsSpeakers {
         $CompanyWebsite = @{Name='Company Website';Expression={($_.links | Where-Object {$_.linktype -eq 'Company Website'}).url}}
         $Other = @{Name='Other';Expression={($_.links | Where-Object {$_.linktype -eq 'Other'}) | ForEach-Object { $_ }}}
         $SessionNames = @{
-            Name='Sessions';Expression={$_.sessions | ForEach-Object {
+            Name='SessionDetails';Expression={$_.sessions | ForEach-Object {
                 $id = $_.id
                 $Session = $AllSessions.Sessions|Where-Object{$_.id -eq $id}
                 [PSCustomObject]@{
