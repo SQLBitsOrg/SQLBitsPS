@@ -2,19 +2,19 @@ function Get-SQLBitsSpeakers {
     <#
     .SYNOPSIS
     Returns the SQLBits Speakers from the Sessionize API
-    
+
     .DESCRIPTION
     This function returns the SQLBits Speakers from the Sessionize API
-    
+
     .PARAMETER search
     Filters the results by the search term
-    
+
     .PARAMETER remote
     A switch to filter the results to only remote speakers
-    
+
     .PARAMETER full
     Returns the full object as output
-    
+
     .EXAMPLE
     Get-SQLBitsSpeakers
 
@@ -58,9 +58,9 @@ function Get-SQLBitsSpeakers {
         $uri = '{0}/speakers' -f $BaseUri
         $sessionuri = '{0}/sessions' -f $BaseUri
         $AllSessions = Invoke-RestMethod -Uri $sessionuri
-        
+
         $Isremote = @{Name='IsRemote';Expression={($_.categories | Where-Object {$_.id -eq '44351';}).categoryItems.name}}
-        
+
         $CompanyName = @{Name='CompanyName';Expression={($_.questionAnswers | Where-Object {$_.id -eq 43369}).Answer}}
         $LinkedIn = @{Name='LinkedIn';Expression={($_.links | Where-Object {$_.linktype -eq 'LinkedIn'}).url}}
         $Sessionize = @{Name='Sessionize';Expression={($_.links | Where-Object {$_.linktype -eq 'Sessionize'}).url}}
@@ -70,16 +70,19 @@ function Get-SQLBitsSpeakers {
         $CompanyWebsite = @{Name='Company Website';Expression={($_.links | Where-Object {$_.linktype -eq 'Company Website'}).url}}
         $Other = @{Name='Other';Expression={($_.links | Where-Object {$_.linktype -eq 'Other'}) | ForEach-Object { $_ }}}
         $SessionNames = @{
-            Name='SessionNames';Expression={$_.sessions | ForEach-Object {
+            Name='Sessions';Expression={$_.sessions | ForEach-Object {
                 $id = $_.id
+                $Session = $AllSessions.Sessions|Where-Object{$_.id -eq $id}
                 [PSCustomObject]@{
                     Name = $_.name
-                    Room = ($AllSessions.Sessions|Where-Object{$_.id -eq $id}).Room
+                    Room = $Session.Room
+                    Starts = $Session.startsAt
+                    Ends = $Session.endsAt
                 }
             }
         }
     }
-        $Data = Invoke-RestMethod -Uri $uri 
+        $Data = Invoke-RestMethod -Uri $uri
         $Data = $Data|Select-Object *,$CompanyName,$Isremote,$LinkedIn,$Sessionize,$Blog,$Facebook,$Twitter,$CompanyWebsite,$Other,$sessionNames
         if (-not $Data) {
             Write-Warning 'No data returned from Sessionize API'
@@ -89,7 +92,7 @@ function Get-SQLBitsSpeakers {
     }
     process {
         if($search) {
-            $Data = $Data | Where-Object { $_.fullName -like "*$search*" } 
+            $Data = $Data | Where-Object { $_.fullName -like "*$search*" }
         }
         if($remote) {
             $Data = $Data | Where-Object { $_.IsRemote -eq 'Remote' }
