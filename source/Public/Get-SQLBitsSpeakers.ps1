@@ -74,7 +74,7 @@ function Get-SQLBitsSpeakers {
                 $id = $_.id
                 $Session = $AllSessions.Sessions|Where-Object{$_.id -eq $id}
                 [PSCustomObject]@{
-                    Name = $_.name
+                    Name = $_.name.Trim()
                     Room = $Session.Room
                     Starts = $Session.startsAt
                     Ends = $Session.endsAt

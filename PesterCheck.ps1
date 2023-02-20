@@ -27,8 +27,8 @@ BeforeDiscovery {
     $Thursday = $Checking | Where-Object Day -EQ 'Thursday'
     $Friday = $Checking | Where-Object Day -EQ 'Friday'
     $Saturday = $Checking | Where-Object Day -EQ 'Saturday'
-    $SponsoredRoom1Name = 'MR 2E'
-    $SponsoredRoom2Name = 'MR 3E'
+    $SponsoredRoom1Name = 'Expo Room 3' # DELL sponsored room
+    $SponsoredRoom2Name = 'Expo Room 1' # Purple Frog sponsored room
     $SponsoredRoom1Sessions = @{
         Name = 'Sponsored Room Session 1'
         Room = $SponsoredRoom1Name
@@ -47,7 +47,8 @@ BeforeDiscovery {
     }, @{
         Name = 'Sponsored Room Session 6'
         Room = $SponsoredRoom1Name
-    }, @{
+    }
+    $SponsoredRoom2Sessions = @{
         Name = 'Power BI governance, disaster recovery and auditing'
         Room = $SponsoredRoom2Name
     }, @{
@@ -62,13 +63,15 @@ BeforeDiscovery {
 
 
     $AllSpeakers = Get-SQLBitsSpeakers -full
-    $RemoteRoom = 'MR 4'
+    $RemoteRoom = 'Expo Room 2'
+
+    $SponsoredRoom2Agenda = (Get-SQLBitsSession -search  $SponsoredRoom2Name | where Title -NotLike '*Power Query*' )
 }
 BeforeAll {
     $Schedule = Get-SQLBitsSchedule -output object
-    $RemoteRoom = 'MR 4'
+    $RemoteRoom = 'Expo Room 2'
     $CommunityCorner = 'Community Corner'
-
+    $SponsoredRoom2Agenda = (Get-SQLBitsSession -search  $SponsoredRoom2Name | where Title -NotLike '*Power Query*' )
 }
 
 Describe "Ensuring <_.'Speaker Name'> available days are granted" -ForEach ($SpeakerRequests | where Available -NE 0) {
@@ -145,15 +148,31 @@ Describe "Ensuring <_.'Speaker Name'> unavailable days AM and PM are granted" -F
 
 }
 
-Describe "Ensuring Sponsor sessions are in the correct room" {
-
-    It "The session <_.Name> should be in the correct room <_.Room>" -ForEach $SponsoredRoom1Sessions {
-        $Name = $Psitem.Name
-        $Results = @{Name = 'Results'; Expression = {
-                $_.psobject.properties.Value -like "*$Name*"
+Describe "Sponsor sessions" {
+    Context "Dell Room" {
+        It "The session <_.Name> should be in the correct room <_.Room>" -ForEach $SponsoredRoom1Sessions {
+            $Name = $Psitem.Name
+            $Results = @{Name = 'Results'; Expression = {
+                    $_.psobject.properties.Value -like "*$Name*"
+                }
             }
-        }
         (($Schedule | Select-Object -Property *, $Results | Where-Object { $null -ne $_.Results }).psobject.properties | Where-Object { $_.Value -like "*$Name*" } )[0].Name | Should -Be $Psitem.Room   -Because "The session $($Psitem.Name) should be in the room $($Psitem.Room)"
+        }
+    }
+
+    Context "PurpleFrog Room" {
+        It "The session <_.Name> should be in the correct room <_.Room>" -ForEach $SponsoredRoom2Sessions {
+            $Name = $Psitem.Name
+            $Results = @{Name = 'Results'; Expression = {
+                    $_.psobject.properties.Value -like "*$Name*"
+                }
+            }
+        (($Schedule | Select-Object -Property *, $Results | Where-Object { $null -ne $_.Results }).psobject.properties | Where-Object { $_.Value -like "*$Name*" } )[0].Name | Should -Be $Psitem.Room   -Because "The session $($Psitem.Name) should be in the room $($Psitem.Room)"
+        }
+        It "<_.Title> should be Power Bi Themed (or Chris Webb)" -ForEach $SponsoredRoom2Agenda {
+
+            $_.Title | Should -BeLike '*Power BI*' -Because "The session $($_) should be Power BI themed"
+        }
     }
 }
 
@@ -177,8 +196,39 @@ Describe "Ensuring Community Corner sessions are in the correct room" {
 Describe "All the remote speakers should be in the correct room" {
     Context "<_.FullName> remote speaker" -ForEach ($AllSpeakers | Where-Object { $_.isRemote -eq 'Remote' }) {
 
-        It "The Session <_.Name> in <_.Room> should be in the correct room $RemoteRoom " -ForEach ($Psitem.SessionNames) {
+        It "The Session <_.Name> in <_.Room> should be in the correct room $RemoteRoom " -ForEach ($Psitem.SessionDetails) {
             $Psitem.Room | Should -Be $RemoteRoom   -Because "The session $($Psitem.Name) should be in the correct room $($Psitem.Room)"
+        }
+    }
+}
+
+
+
+Describe "Speakers should not be scheduled straight after a session" {
+    Context "Speaker <_.fullName>" -ForEach ($AllSpeakers | Where-Object { $_.SessionDetails.Count -gt 1 }) {
+        BeforeAll {
+            $sorted = [Collections.Generic.List[Object]]($_.SessionDetails | Sort-Object starts)
+            $SpeakerSessions = $sorted | ForEach-Object {
+                $PrevIndex = ($sorted.FindIndex({$args[0].Name -eq $_.Name}) )-1
+                $PreviousTime = @{Name='PreviousStarts';Expression = { $Sorted[$previndex].Starts}}
+                $PreviousName = @{Name='PreviousName';Expression = { $Sorted[$previndex].Name}}
+
+                $_ | Select Name,Starts ,$PreviousTime,$PreviousName
+                }
+        }
+        BeforeDiscovery {
+            $sorted = [Collections.Generic.List[Object]]($_.SessionDetails | Sort-Object starts)
+            $SpeakerSessions = $sorted  | ForEach-Object {
+                $PrevIndex = ($sorted.FindIndex({$args[0].Name -eq $_.Name}) )-1
+                $PreviousTime = @{Name='PreviousStarts';Expression = { $Sorted[$previndex].Starts}}
+                $PreviousName = @{Name='PreviousName';Expression = { $Sorted[$previndex].Name}}
+
+                $_ | Select Name,Starts ,$PreviousTime,$PreviousName
+                }
+        }
+        It "<_.Name> at <_.Starts> and <_.PreviousName> at <_.PreviousStarts>" -ForEach ($SpeakerSessions | Select-Object -Skip 1) {
+
+            ($_.Starts - $_.PreviousStarts)| Should -BeGreaterThan 01:00:00 -Because "The session $($Psitem.Name) should not be scheduled straight after another session but $($Psitem.PreviousName) is scheduled at $($Psitem.PreviousStarts)"
         }
     }
 }
