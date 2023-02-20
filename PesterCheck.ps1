@@ -58,7 +58,7 @@ BeforeDiscovery {
         Room = $SponsoredRoom2Name
     }
     $CommunityCorner = 'Community Corner'
-    $CommunityCornerTitles = 'Meet the PG: SQL Leadership', 'Meet the PG: Azure SQL Managed Instance', 'Meet the PG: SQL Server on Azure VMs', 'Meet the PG: Microsoft Purview ', 'Meet the PG: Just Use Extended Events Already with Erin Stellato', 'Meet the PG: Azure Synapse Analytics ', 'Meet the PG: Azure Arc enabled SQL Server / Arc SQL MI', 'Meet the PG: Azure SQL ', 'Meet the PG: SQL Server ', 'Meet the PG: Power BI '
+    $CommunityCornerTitles = 'Meet the PG: SQL Leadership', 'Meet the PG: Azure SQL Managed Instance', 'Meet the PG: SQL Server on Azure VMs', 'Meet the PG: Microsoft Purview', 'Meet the PG: Just Use Extended Events Already with Erin Stellato', 'Meet the PG: Azure Synapse Analytics', 'Meet the PG: Azure Arc enabled SQL Server / Arc SQL MI', 'Meet the PG: Azure SQL', 'Meet the PG: SQL Server', 'Meet the PG: Power BI'
 
 
     $AllSpeakers = Get-SQLBitsSpeakers -full
@@ -67,6 +67,8 @@ BeforeDiscovery {
 BeforeAll {
     $Schedule = Get-SQLBitsSchedule -output object
     $RemoteRoom = 'MR 4'
+    $CommunityCorner = 'Community Corner'
+
 }
 
 Describe "Ensuring <_.'Speaker Name'> available days are granted" -ForEach ($SpeakerRequests | where Available -NE 0) {
@@ -151,17 +153,24 @@ Describe "Ensuring Sponsor sessions are in the correct room" {
                 $_.psobject.properties.Value -like "*$Name*"
             }
         }
-        (($Schedule  | Select-Object -Property *, $Results | Where-Object { $null -ne $_.Results }).psobject.properties | Where-Object { $_.Value -like "*$Name*" } )[0].Name| Should -Be $Psitem.Room   -Because "The session $($Psitem.Name) should be in the room $($Psitem.Room)"
+        (($Schedule | Select-Object -Property *, $Results | Where-Object { $null -ne $_.Results }).psobject.properties | Where-Object { $_.Value -like "*$Name*" } )[0].Name | Should -Be $Psitem.Room   -Because "The session $($Psitem.Name) should be in the room $($Psitem.Room)"
     }
 }
 
 Describe "Ensuring Community Corner sessions are in the correct room" {
-    It "The session <_> should be in the correct room" -ForEach $CommunityCornerTitles {
+
+    It "The session <_> should be in the correct room $CommunityCorner " -ForEach $CommunityCornerTitles {
+        $Title = $_
         $Results = @{Name = 'Results'; Expression = {
-                $_.psobject.properties.Value -like "*$_*"
+            ($_.psobject.properties.Value -split "`n").Trim() -eq "$Title"
             }
         }
-        (($Schedule  | Select-Object -Property *, $Results | Where-Object { $null -ne $_.Results }).psobject.properties | Where-Object { $_.Value -like "*$_*" } )[0].Name| Should -Be $Psitem.Room -Because "The session $($Psitem.Name) should be in the Community Corner "
+        $RommitIsIn = @{Name = 'RoomitisIn'; Expression = {
+        ($_.psobject.properties | Where-Object {
+         ($_.Value -split "`n").Trim() -eq "$Title" }).Name
+            }
+        }
+        ($Schedule | Select-Object -Property *, $Results , $RommitIsIn | Where-Object { $_.Results -ne $null }).RoomItIsIn | Should -Be $CommunityCorner -Because "The session $($Psitem.Name) should be in the Community Corner "
     }
 }
 
