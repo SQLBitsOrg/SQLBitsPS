@@ -28,6 +28,8 @@ Ensure that you have Pester v5 installed
 
 Ensure that you have the SpeakerRequests.xlxs file on your local machine and you know the path to it.
 
+Make sure that all the speakers have been informed. The API is set to only show sessions that have been accepted, confirmed and informed.
+
 ## To run
 
 Then all that you need to do is at the root of the repository run
