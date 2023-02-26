@@ -6,7 +6,7 @@ BeforeDiscovery {
         'BEARD-DESKTOP' {
             $file = 'G:\SQLBits Limited (O365)\SQLBits portal - Shared Documents\2023\Speakers\SpeakerRequests.xlsx'
         }
-        'BEARD-SURFACELA1' {
+        'BEARD-SURFACELA' {
             $file = 'C:\Users\mrrob\SQLBits Limited (O365)\SQLBits portal - 2023\Speakers\SpeakerRequests.xlsx'
         }
         default {
@@ -30,22 +30,22 @@ BeforeDiscovery {
     $SponsoredRoom1Name = 'Expo Room 3' # DELL sponsored room
     $SponsoredRoom2Name = 'Expo Room 1' # Purple Frog sponsored room
     $SponsoredRoom1Sessions = @{
-        Name = 'Sponsored Room Session 1'
+        Name = "Data Modernization in a Hybrid World"
         Room = $SponsoredRoom1Name
     }, @{
-        Name = 'Sponsored Room Session 2'
+        Name = "SQL Server 2022 – Time to Rethink your Backup and Recovery Strategy"
         Room = $SponsoredRoom1Name
     }, @{
-        Name = 'Sponsored Room Session 3'
+        Name = "Dell and Azure Arc-enabled data services - SQL MI Business Critical"
         Room = $SponsoredRoom1Name
     }, @{
-        Name = 'Sponsored Room Session 4'
+        Name = "Azure Stack HCI and Microsoft Hybrid Data Services"
         Room = $SponsoredRoom1Name
     }, @{
-        Name = 'Sponsored Room Session 5'
+        Name = "The Microsoft Intelligent Data Platform and Dell"
         Room = $SponsoredRoom1Name
     }, @{
-        Name = 'Sponsored Room Session 6'
+        Name = "SQL 2022 and S3 – Dell’s overview of consuming object data via Microsoft SQL"
         Room = $SponsoredRoom1Name
     }
     $SponsoredRoom2Sessions = @{
@@ -65,13 +65,15 @@ BeforeDiscovery {
     $AllSpeakers = Get-SQLBitsSpeakers -full
     $RemoteRoom = 'Expo Room 2'
 
-    $SponsoredRoom2Agenda = (Get-SQLBitsSession -search  $SponsoredRoom2Name | where Title -NotLike '*Power Query*' )
+    # so that we can check that the correct sessions are in PF Room 
+    $SponsoredRoom2Agenda = (Get-SQLBitsSession -search $SponsoredRoom2Name | where Title -NotLike '*Power Query*' | where Title -NotLike '*optimizing enterprise data models*' )
 }
 BeforeAll {
     $Schedule = Get-SQLBitsSchedule -output object
     $RemoteRoom = 'Expo Room 2'
     $CommunityCorner = 'Community Corner'
-    $SponsoredRoom2Agenda = (Get-SQLBitsSession -search  $SponsoredRoom2Name | where Title -NotLike '*Power Query*' )
+    # so that we can check that the correct sessions are in PF Room 
+    $SponsoredRoom2Agenda = (Get-SQLBitsSession -search $SponsoredRoom2Name | where Title -NotLike '*Power Query*' | where Title -NotLike '*optimizing enterprise data models*' )
 }
 
 Describe "Ensuring <_.'Speaker Name'> available days are granted" -ForEach ($SpeakerRequests | where Available -NE 0) {
@@ -209,26 +211,26 @@ Describe "Speakers should not be scheduled straight after a session" {
         BeforeAll {
             $sorted = [Collections.Generic.List[Object]]($_.SessionDetails | Sort-Object starts)
             $SpeakerSessions = $sorted | ForEach-Object {
-                $PrevIndex = ($sorted.FindIndex({$args[0].Name -eq $_.Name}) )-1
-                $PreviousTime = @{Name='PreviousStarts';Expression = { $Sorted[$previndex].Starts}}
-                $PreviousName = @{Name='PreviousName';Expression = { $Sorted[$previndex].Name}}
+                $PrevIndex = ($sorted.FindIndex({ $args[0].Name -eq $_.Name }) ) - 1
+                $PreviousTime = @{Name = 'PreviousStarts'; Expression = { $Sorted[$previndex].Starts } }
+                $PreviousName = @{Name = 'PreviousName'; Expression = { $Sorted[$previndex].Name } }
 
-                $_ | Select Name,Starts ,$PreviousTime,$PreviousName
-                }
+                $_ | select Name, Starts , $PreviousTime, $PreviousName
+            }
         }
         BeforeDiscovery {
             $sorted = [Collections.Generic.List[Object]]($_.SessionDetails | Sort-Object starts)
-            $SpeakerSessions = $sorted  | ForEach-Object {
-                $PrevIndex = ($sorted.FindIndex({$args[0].Name -eq $_.Name}) )-1
-                $PreviousTime = @{Name='PreviousStarts';Expression = { $Sorted[$previndex].Starts}}
-                $PreviousName = @{Name='PreviousName';Expression = { $Sorted[$previndex].Name}}
+            $SpeakerSessions = $sorted | ForEach-Object {
+                $PrevIndex = ($sorted.FindIndex({ $args[0].Name -eq $_.Name }) ) - 1
+                $PreviousTime = @{Name = 'PreviousStarts'; Expression = { $Sorted[$previndex].Starts } }
+                $PreviousName = @{Name = 'PreviousName'; Expression = { $Sorted[$previndex].Name } }
 
-                $_ | Select Name,Starts ,$PreviousTime,$PreviousName
-                }
+                $_ | select Name, Starts , $PreviousTime, $PreviousName
+            }
         }
         It "<_.Name> at <_.Starts> and <_.PreviousName> at <_.PreviousStarts>" -ForEach ($SpeakerSessions | Select-Object -Skip 1) {
 
-            ($_.Starts - $_.PreviousStarts)| Should -BeGreaterThan 01:00:00 -Because "The session $($Psitem.Name) should not be scheduled straight after another session but $($Psitem.PreviousName) is scheduled at $($Psitem.PreviousStarts)"
+            ($_.Starts - $_.PreviousStarts) | Should -BeGreaterThan 01:00:00 -Because "The session $($Psitem.Name) should not be scheduled straight after another session but $($Psitem.PreviousName) is scheduled at $($Psitem.PreviousStarts)"
         }
     }
 }
