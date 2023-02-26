@@ -90,9 +90,9 @@ Rob Sewell
                     $_.psobject.properties.Value -like "*$search*"
                 }
             }
-        $rawsessions | Where-Object {$PSItem.isServiceSession -eq $false -and $PsItem.isPlenumSession -eq $false } | Select-Object -Property *, $Results | Where-Object { $null -ne $_.Results }  | Select title,description,startsAt,EndsAt,$Speakers,$PrimaryTheme,$SessionLength,room
+        $rawsessions | Where-Object {$PSItem.isServiceSession -eq $false -and $PsItem.isPlenumSession -eq $false } | Select-Object -Property *, $Results | Where-Object { $null -ne $_.Results }  | Select title,description,startsAt,EndsAt,$Speakers,$PrimaryTheme,$SessionLength,room,id
         } else {
-            $rawsessions | Where-Object {$PSItem.isServiceSession -eq $false -and $PsItem.isPlenumSession -eq $false } | Select title,description,startsAt,EndsAt,$Speakers,$PrimaryTheme,$SessionLength,room
+            $rawsessions | Where-Object {$PSItem.isServiceSession -eq $false -and $PsItem.isPlenumSession -eq $false } | Select title,description,startsAt,EndsAt,$Speakers,$PrimaryTheme,$SessionLength,room,id
         }
     }
 
