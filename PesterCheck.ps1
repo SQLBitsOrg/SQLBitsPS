@@ -1,6 +1,26 @@
 # Validates the Sessionize schedule against the Speaker Requests
 
 BeforeDiscovery {
+    $RequiredModuleVersion = [version]'1.2.0'
+    $RequiredModulePreRelease = 'preview0001'
+    if (-not (Get-Module -ListAvailable -Name SQLBitsPS -ErrorAction SilentlyContinue )) {
+        Write-Output "I need to install the SQLBitsPS module from the PowerShell Gallery"
+        Install-Module -Name SQLBitsPS -Scope CurrentUser -Force -AllowPrerelease
+    }
+    if (-not (Get-Module -ListAvailable -Name ImportExcel -ErrorAction SilentlyContinue )) {
+        Write-Output "I need to install the ImportExcel module from the PowerShell Gallery"
+        Install-Module -Name ImportExcel -Scope CurrentUser -Force
+    }
+
+    $SQLBitsPS = Get-Module -ListAvailable -Name SQLBitsPS -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($SQLBitsPS.Version -lt $RequiredModuleVersion) {
+        Write-Output "I need to update the SQLBitsPS module from the PowerShell Gallery"
+        Install-Module -Name SQLBitsPS -Scope CurrentUser -Force -AllowPrerelease
+    }
+    if ($SQLBitsPS.PrivateData.PsData.PreRelease -lt $RequiredModulePreRelease) {
+        Write-Output "I need to update the SQLBitsPS module from the PowerShell Gallery for a new prerelease version"
+        Install-Module -Name SQLBitsPS -Scope CurrentUser -Force -AllowPrerelease
+    }
 
     switch ($env:computername) {
         'BEARD-DESKTOP' {
@@ -65,14 +85,16 @@ BeforeDiscovery {
     $AllSpeakers = Get-SQLBitsSpeakers -full
     $RemoteRoom = 'Expo Room 2'
 
-    # so that we can check that the correct sessions are in PF Room 
+    # so that we can check that the correct sessions are in PF Room
     $SponsoredRoom2Agenda = (Get-SQLBitsSession -search $SponsoredRoom2Name | where Title -NotLike '*Power Query*' | where Title -NotLike '*optimizing enterprise data models*' )
+
+    $PanelRoom = 'Auditorium'
 }
 BeforeAll {
     $Schedule = Get-SQLBitsSchedule -output object
     $RemoteRoom = 'Expo Room 2'
     $CommunityCorner = 'Community Corner'
-    # so that we can check that the correct sessions are in PF Room 
+    # so that we can check that the correct sessions are in PF Room
     $SponsoredRoom2Agenda = (Get-SQLBitsSession -search $SponsoredRoom2Name | where Title -NotLike '*Power Query*' | where Title -NotLike '*optimizing enterprise data models*' )
 }
 
@@ -232,5 +254,11 @@ Describe "Speakers should not be scheduled straight after a session" {
 
             ($_.Starts - $_.PreviousStarts) | Should -BeGreaterThan 01:00:00 -Because "The session $($Psitem.Name) should not be scheduled straight after another session but $($Psitem.PreviousName) is scheduled at $($Psitem.PreviousStarts)"
         }
+    }
+}
+
+Describe "Panel Sessions should be in the Auditorium" {
+    It "<_.title> that starts at <_.startsAt> should be in the Auditorium" -ForEach (Get-SqlBitsPanelSessions -ExcludeCommunityCorner){
+        $_.room | Should -Be 'Auditorium' -Because "The session $($_.title) is a panel session and should be in the Auditorium"
     }
 }
