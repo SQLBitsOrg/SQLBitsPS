@@ -56,9 +56,6 @@ BeforeDiscovery {
         Name = "SQL Server 2022 – Time to Rethink your Backup and Recovery Strategy"
         Room = $SponsoredRoom1Name
     }, @{
-        Name = "Dell and Azure Arc-enabled data services - SQL MI Business Critical"
-        Room = $SponsoredRoom1Name
-    }, @{
         Name = "Azure Stack HCI and Microsoft Hybrid Data Services"
         Room = $SponsoredRoom1Name
     }, @{
