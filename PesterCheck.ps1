@@ -92,7 +92,7 @@ BeforeDiscovery {
 }
 BeforeAll {
     $Schedule = Get-SQLBitsSchedule -output object
-    $RemoteRoom = 'Expo Room 2'
+    $RemoteRooms = @('MR 1A', 'MR 1B')
     $CommunityCorner = 'Community Corner'
     # so that we can check that the correct sessions are in PF Room
     $SponsoredRoom2Agenda = (Get-SQLBitsSession -search $SponsoredRoom2Name | where Title -NotLike '*Power Query*' | where Title -NotLike '*optimizing enterprise data models*' )
@@ -220,8 +220,8 @@ Describe "Ensuring Community Corner sessions are in the correct room" {
 Describe "All the remote speakers should be in the correct room" {
     Context "<_.FullName> remote speaker" -ForEach ($AllSpeakers | Where-Object { $_.isRemote -eq 'Remote' }) {
 
-        It "The Session <_.Name> in <_.Room> should be in the correct room $RemoteRoom " -ForEach ($Psitem.SessionDetails) {
-            $Psitem.Room | Should -Be $RemoteRoom   -Because "The session $($Psitem.Name) should be in the correct room $($Psitem.Room)"
+        It "The Session <_.Name> in <_.Room> should be in the correct room $RemoteRooms " -ForEach ($Psitem.SessionDetails) {
+            $Psitem.Room | Should -BeIn $RemoteRooms   -Because "The session $($Psitem.Name) should be in the correct room $($Psitem.Room)"
         }
     }
 }
@@ -257,8 +257,8 @@ Describe "Speakers should not be scheduled straight after a session" {
     }
 }
 
-Describe "Panel Sessions should be in the Auditorium" {
-    It "<_.title> that starts at <_.startsAt> should be in the Auditorium" -ForEach (Get-SqlBitsPanelSessions -ExcludeCommunityCorner){
-        $_.room | Should -Be 'Auditorium' -Because "The session $($_.title) is a panel session and should be in the Auditorium"
+Describe "Panel Sessions should be in trooms with multiple microphones" {
+    It "<_.title> that starts at <_.startsAt> should be in the Auditorium or MR1A" -ForEach (Get-SqlBitsPanelSessions -ExcludeCommunityCorner){
+        $_.room | Should -BeIn @('Auditorium','MR 1A') -Because "The session $($_.title) is a panel session and should be in the Auditorium or MR1A"
     }
 }
