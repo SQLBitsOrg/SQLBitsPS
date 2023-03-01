@@ -59,9 +59,6 @@ BeforeDiscovery {
         Name = "Azure Stack HCI and Microsoft Hybrid Data Services"
         Room = $SponsoredRoom1Name
     }, @{
-        Name = "The Microsoft Intelligent Data Platform and Dell"
-        Room = $SponsoredRoom1Name
-    }, @{
         Name = "SQL 2022 and S3 – Dell’s overview of consuming object data via Microsoft SQL"
         Room = $SponsoredRoom1Name
     }
