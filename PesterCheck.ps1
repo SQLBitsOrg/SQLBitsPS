@@ -92,7 +92,7 @@ BeforeDiscovery {
 }
 BeforeAll {
     $Schedule = Get-SQLBitsSchedule -output object
-    $RemoteRooms = @('MR 1A', 'MR 1B')
+    $RemoteRooms = @('Auditorium','MR 1A', 'MR 1B')
     $CommunityCorner = 'Community Corner'
     # so that we can check that the correct sessions are in PF Room
     $SponsoredRoom2Agenda = (Get-SQLBitsSession -search $SponsoredRoom2Name | where Title -NotLike '*Power Query*' | where Title -NotLike '*optimizing enterprise data models*' )
@@ -258,7 +258,7 @@ Describe "Speakers should not be scheduled straight after a session" {
 }
 
 Describe "Panel Sessions should be in trooms with multiple microphones" {
-    It "<_.title> that starts at <_.startsAt> should be in the Auditorium or MR1A" -ForEach (Get-SqlBitsPanelSessions -ExcludeCommunityCorner){
-        $_.room | Should -BeIn @('Auditorium','MR 1A') -Because "The session $($_.title) is a panel session and should be in the Auditorium or MR1A"
+    It "<_.title> that starts at <_.startsAt> should be in the $RemoteRooms" -ForEach (Get-SqlBitsPanelSessions -ExcludeCommunityCorner){
+        $_.room | Should -BeIn $RemoteRooms -Because "The session $($_.title) is a panel session and should be in $RemoteRooms"
     }
 }
