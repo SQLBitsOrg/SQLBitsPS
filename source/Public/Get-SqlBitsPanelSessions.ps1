@@ -31,10 +31,10 @@ function Get-SqlBitsPanelSessions {
     $speakerCount = @{Name = 'NumberOfSpeakers'; Expression = { ($_.Speakers -split ',').Count } }
     switch ($ExcludeCommunityCorner) {
         $true {
-            Get-SQLBitsSession | where room -NE 'Community Corner' | select title, room, $speakerCount,startsAt,endsAt | where 'NumberOfSpeakers' -GT 1
+            Get-SQLBitsSession | where room -NE 'Community Corner' | select title, room, $speakerCount,startsAt,endsAt | where 'NumberOfSpeakers' -GT 2
         }
         $false {
-            Get-SQLBitsSession  | select title, room, $speakerCount,startsAt,endsAt | where 'NumberOfSpeakers' -GT 1
+            Get-SQLBitsSession  | select title, room, $speakerCount,startsAt,endsAt | where 'NumberOfSpeakers' -Gt 2
         }
         Default {}
     }
