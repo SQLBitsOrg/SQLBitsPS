@@ -49,10 +49,7 @@ BeforeDiscovery {
     $Saturday = $Checking | Where-Object Day -EQ 'Saturday'
     $SponsoredRoom1Name = 'Expo Room 3' # DELL sponsored room
     $SponsoredRoom2Name = 'Expo Room 1' # Purple Frog sponsored room
-    $SponsoredRoom1Sessions = @{
-        Name = "Data Modernization in a Hybrid World"
-        Room = $SponsoredRoom1Name
-    }, @{
+    $SponsoredRoom1Sessions =  @{
         Name = "SQL Server 2022 – Time to Rethink your Backup and Recovery Strategy"
         Room = $SponsoredRoom1Name
     }, @{
