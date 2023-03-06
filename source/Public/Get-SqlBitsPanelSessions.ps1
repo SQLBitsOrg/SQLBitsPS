@@ -9,6 +9,9 @@ function Get-SqlBitsPanelSessions {
     .PARAMETER ExcludeCommunityCorner
     Exclude the Community Corner sessions
 
+    .PARAMETER includeSponsorSessions
+    Do we want to include the sessions here
+
     .EXAMPLE
     Get-SqlBitsPanelSessions
 
