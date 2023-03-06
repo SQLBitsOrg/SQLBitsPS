@@ -85,7 +85,6 @@ BeforeDiscovery {
     # so that we can check that the correct sessions are in PF Room
     $SponsoredRoom2Agenda = (Get-SQLBitsSession -search $SponsoredRoom2Name | where Title -NotLike '*Power Query*' | where Title -NotLike '*optimizing enterprise data models*' )
 
-    $PanelRoom = 'Auditorium'
 }
 BeforeAll {
     $Schedule = Get-SQLBitsSchedule -output object
@@ -256,7 +255,8 @@ Describe "Speakers should not be scheduled straight after a session" {
 }
 
 Describe "Panel Sessions should be in rooms with multiple microphones" {
-    It "<_.title> that starts at <_.startsAt> should be in the $PanelRooms" -ForEach (Get-SqlBitsPanelSessions -ExcludeCommunityCorner){
+        $includeSponsorSessions
+    It "<_.title> that starts at <_.startsAt> should be in the $PanelRooms" -ForEach (Get-SqlBitsPanelSessions -ExcludeCommunityCorner -includeSponsorSessions:$false) {
         $_.room | Should -BeIn $PanelRooms -Because "The session $($_.title) is a panel session and should be in $PanelRooms"
     }
 }
