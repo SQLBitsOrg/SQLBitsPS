@@ -14,7 +14,7 @@ if ($context.Tenant.Id -ne $tenantId) {
 }
 if ( (Get-AzSubscription -WarningAction SilentlyContinue).SubscriptionId -ne $subscriptionId) {
     Write-Host "Switching to SQLBits Subscription"
-    Select-AzSubscription -SubscriptionId
+    Select-AzSubscription -SubscriptionId $subscriptionId
 }
 $sqlInstance = 'sqlbitsweb.database.windows.net'
 $azureToken = Get-AzAccessToken -ResourceUrl https://database.windows.net
@@ -41,7 +41,8 @@ $feedbackLinks = Invoke-DbaQuery -SqlInstance $sqlbits -Query $query -As PSObjec
 
 $Sessions = foreach ($session in $schedule) {
    $FeedbackLink = 'Feedback Link :- {0}' -f ( ($feedbackLinks | Where-Object {$_.ExternalId -eq $session.id}).FeedbackURLShort)
-   $Description = '{0} {1}' -f (-join $Session.description[0..450]), $FeedbackLink
+     $Description = '{0} {1}' -f (-join $Session.description[0..4950]), $FeedbackLink
+   #  $Description = '{0} {1}' -f $Session.description, $FeedbackLink
      $Speakers = $session.Speakers -split ', ' | ForEach-Object { $_.Trim() }
      $SpeakersInfo = ($Speakers | ForEach-Object {
         $Details = $SpeakersFromWeb | Where fullName -eq $_
@@ -98,7 +99,7 @@ $TDschedule = Get-SQLBitsTDSession
 
 $TDSessionsforcsv = foreach ($session in $TDschedule) {
    $FeedbackLink = 'Feedback Link :- {0}' -f ( ($feedbackLinks | Where-Object {$_.ExternalId -eq $session.id}).FeedbackURLShort)
-   $Description = '{0} {1}' -f (-join $Session.description[0..450]), $FeedbackLink
+   $Description = '{0} {1}' -f (-join $Session.description[0..4950]), $FeedbackLink
     $Speakers = $session.Speakers -split ', ' | ForEach-Object { $_.Trim() }
     $SpeakersInfo = ($Speakers | ForEach-Object {
        $Details = $TDSpeakersFromWeb | Where fullName -eq $_

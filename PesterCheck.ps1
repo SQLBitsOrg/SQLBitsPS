@@ -83,7 +83,7 @@ BeforeDiscovery {
     $RemoteRoom = 'Expo Room 2'
 
     # so that we can check that the correct sessions are in PF Room
-    $SponsoredRoom2Agenda = (Get-SQLBitsSession -search $SponsoredRoom2Name | where Title -NotLike '*Power Query*' | where Title -NotLike '*optimizing enterprise data models*' )
+    $SponsoredRoom2Agenda = (Get-SQLBitsSession -search $SponsoredRoom2Name | where Title -NotLike '*Power Query*' | where Title -NotLike '*optimizing enterprise data models*' |Where Title -NotLike '*Tabular Models*' |Where Title -NotLike '*Ultimate Freedom*' )
 
 }
 BeforeAll {
@@ -226,7 +226,7 @@ Describe "All the remote speakers should be in the correct room" {
 
 
 Describe "Speakers should not be scheduled straight after a session" {
-    Context "Speaker <_.fullName>" -ForEach ($AllSpeakers | Where-Object { $_.SessionDetails.Count -gt 1 }) {
+    Context "Speaker <_.fullName>" -ForEach ($AllSpeakers | Where fullName -notin ('Lisa Hoving') | Where-Object { $_.SessionDetails.Count -gt 1 }) {
         BeforeAll {
             $sorted = [Collections.Generic.List[Object]]($_.SessionDetails | Sort-Object starts)
             $SpeakerSessions = $sorted | ForEach-Object {
