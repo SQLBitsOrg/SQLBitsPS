@@ -83,7 +83,7 @@ BeforeDiscovery {
     $RemoteRoom = 'Expo Room 2'
 
     # so that we can check that the correct sessions are in PF Room
-    $SponsoredRoom2Agenda = (Get-SQLBitsSession -search $SponsoredRoom2Name | where Title -NotLike '*Power Query*' | where Title -NotLike '*optimizing enterprise data models*' |Where Title -NotLike '*Tabular Models*' |Where Title -NotLike '*Ultimate Freedom*' )
+    $SponsoredRoom2Agenda = (Get-SQLBitsSession -search $SponsoredRoom2Name | where Title -NotLike '*Power Query*' | where Title -NotLike '*optimizing enterprise data models*' |Where Title -NotLike '*Tabular Models*' |Where Title -NotLike '*Ultimate Freedom*' |where Title -ne 'User Group Leaders Meeting' )
 
 }
 BeforeAll {
