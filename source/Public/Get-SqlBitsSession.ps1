@@ -39,7 +39,7 @@ Rob Sewell
         $all
     )
 
-    $BaseUri = 'https://sessionize.com/api/v2/u1qovn3p/view'
+    $BaseUri = 'https://sessionize.com/api/v2/8utc2qgu/view'
     $Date = Get-Date -Format 'yyyy-MM-dd-HH-mm-ss'
 
     #TODO Add other options
@@ -79,10 +79,11 @@ Rob Sewell
     }
     $Speakers = @{Name='Speakers'; Expression = {$PsItem.speakers.name -join ', '}}
     $PrimaryTheme = @{Name='PrimaryTheme'; Expression = {($PsItem.categories | Where Name -eq 'Primary Theme').categoryItems.name}}
-    $SessionLength = @{Name='SessionLength'; Expression = {($PsItem.categories | Where id -eq 34075).categoryItems.name -replace ' sessoin', ''}}
+    $SessionLength = @{Name='SessionLength'; Expression = {($PsItem.categories | Where name -eq 'Session Length').categoryItems.name -replace ' sessoin', ''}}
+    $sessionizeUrl =  @{Name='sessionizeUrl'; Expression = {'https://sessionize.com/app/organizer/session/12744/{0}' -f $PSItem.id}}
 
     if($all){
-        $rawsessions | Select title,description,startsAt,EndsAt,$Speakers,$PrimaryTheme,$SessionLength,room
+        $rawsessions | Select title,description,startsAt,EndsAt,$Speakers,$PrimaryTheme,$SessionLength,room,id,  $sessionizeUrl
     }else{
         if ($search) {
 

@@ -71,7 +71,7 @@ function Get-SQLBitsSchedule {
         $show
     )
 
-    $BaseUri = 'https://sessionize.com/api/v2/u1qovn3p/view'
+    $BaseUri = 'https://sessionize.com/api/v2/8utc2qgu/view'
     $Date = Get-Date -Format 'yyyy-MM-dd-HH-mm-ss'
 
     #TODO Add other options
@@ -132,7 +132,7 @@ function Get-SQLBitsSchedule {
         }
     )
     if ($IsCoreCLR) {
-        $rawsessions = $Data.sessions 
+        $rawsessions = $Data.sessions
     } else {
         $rawsessions = $Data.sessions | select -Property id, title, @{Name = 'startsAt'; expression = { [datetime]$_.startsAt } } , @{Name = 'endsAt'; expression = { [datetime]$_.endsAt } }, roomID, speakers
 
@@ -142,7 +142,7 @@ function Get-SQLBitsSchedule {
     # if we have a search filter, filter the sessions
     if ($search) {
         $Results = @{Name = 'Results'; Expression = {
-                $_.psobject.properties.Value -like "*$search*" 
+                $_.psobject.properties.Value -like "*$search*"
             }
         }
         $RoomSearch = @{Name = 'Room'; Expression = {
@@ -153,7 +153,7 @@ function Get-SQLBitsSchedule {
         $Session = @{Name = 'Session'; Expression = { ($_.Results -Split "`n")[0] } }
         $sessions = $sessions | Select-Object -Property *, $RoomSearch, $Results | Where-Object { $null -ne $_.Results } | Select-Object -Property Day, StartTime, EndTime, Room, $speakerSearch, $Session
     }
-    
+
 
     switch ($output) {
         'Raw' {

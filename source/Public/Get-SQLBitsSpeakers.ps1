@@ -53,7 +53,7 @@ function Get-SQLBitsSpeakers {
         [switch]$full
     )
     begin {
-        $BaseUri = 'https://sessionize.com/api/v2/u1qovn3p/view'
+        $BaseUri = 'https://sessionize.com/api/v2/8utc2qgu/view'
         $Date = Get-Date -Format 'yyyy-MM-dd-HH-mm-ss'
         $uri = '{0}/speakers' -f $BaseUri
         $sessionuri = '{0}/sessions' -f $BaseUri
