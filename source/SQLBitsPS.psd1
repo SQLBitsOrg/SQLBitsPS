@@ -30,7 +30,7 @@ CompanyName = 'robsewell.com'
 Copyright = '(c) Rob Sewell. All rights reserved.'
 
 # Description of the functionality provided by this module
-Description = 'A module for gathering information about SQLBits agenda. This module can be used to return the information in Sessionize about the SQLBits agenda in a number of formats for both training days and general sessions.'
+Description = 'A module for gathering information about SQLBits agenda. This module can be used to return the information in Sessionize about the SQLBits agenda in a number of formats for both training days and general sessions.New for 2024'
 
 # Minimum version of the PowerShell engine required by this module
 # PowerShellVersion = ''
