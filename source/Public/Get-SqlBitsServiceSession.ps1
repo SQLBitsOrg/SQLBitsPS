@@ -97,10 +97,10 @@ function Get-SqlBitsServiceSession {
             $output = $filteredSessions | Where-Object { $_.title -like '*break*' }
         }
         'Sponsor50' {
-            $output = $filteredSessions | Where-Object { $_.title -like '*Sponsor*Session*50' }
+            $output = $filteredSessions | Where-Object { $_.title -like '*Sponsor*Session*50*' }
         }
         'Sponsor20' {
-            $output = $filteredSessions | Where-Object { $_.title -like '*Sponsor*Session*20' }
+            $output = $filteredSessions | Where-Object { $_.title -like '*Sponsor*Session*20*' }
         }
         'Microsoft' {
             $output = $filteredSessions | Where-Object { $_.title -like '*Microsoft*' }
