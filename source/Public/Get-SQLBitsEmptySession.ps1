@@ -52,17 +52,16 @@ function Get-SQLBitsEmptySession {
         [string]
         $output = 'Raw',
         [Parameter()]
-        [switch]$excludeCommunityCorner,
+
         [switch]$excludeZeros
     )
     $Schedule = Get-SQLBitsSchedule -output object
-    $plenarysessions = 'Registration', 'Quick Break', 'Closing Keynote and Prize Giving', 'End - TearDown', 'Coffee Break', 'Lunch', 'Free Time', 'Prize Giving', 'Party', 'Pub Quiz', 'Keynote by The Community', 'End - TearDown'
+
     $KeyNotes = 'Keynote by The Community', 'Opening Keynote'
-    if($excludeCommunityCorner){
-        $sessionss =  $Schedule | Where-Object { $_.'All Rooms'.Trim() -notin $plenarysessions -and $_.Auditorium.Trim() -notlike '*The Kingdom of AdventureWorks Calls for Aid*' -and $_.Auditorium -notlike '*Keynote by The Community*'} | select * -ExcludeProperty 'All Rooms','Community Corner'
-    } else {
-        $sessionss = $Schedule | Where-Object {($_.'All Rooms'.Trim() -notin $plenarysessions ) -and  ($_.Auditorium.Trim() -notin $KeyNotes) -and ($_.Auditorium.Trim() -notlike '*The Kingdom of AdventureWorks Calls for Aid*') -and ($_.Auditorium -notlike '*Keynote by The Community*' )}| select * -ExcludeProperty 'All Rooms'
-    }
+    $plenarysessions = 'Registration', 'Quick Break', 'Closing Keynote and Prize Giving', 'End - TearDown', 'Coffee Break', 'Lunch', 'Free Time', 'Prize Giving', 'Party', 'Pub Quiz', 'Keynote by the community', 'End - TearDown'
+
+    $sessionss = $Schedule | Where-Object {($_.'Room 1'.Trim() -notin $plenarysessions ) -and  ($_.'Room 1'.Trim() -notlike 'KeyNote by the community*') }| Select-Object * -ExcludeProperty 'All Rooms'
+
 
 
     $rawOutput = foreach ($time in $sessionss) {
