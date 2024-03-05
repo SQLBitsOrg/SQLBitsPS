@@ -60,7 +60,7 @@ function Get-SQLBitsEmptySession {
     $KeyNotes = 'Keynote by The Community', 'Opening Keynote'
     $plenarysessions = 'Registration', 'Quick Break', 'Closing Keynote and Prize Giving', 'End - TearDown', 'Coffee Break', 'Lunch', 'Free Time', 'Prize Giving', 'Party', 'Pub Quiz', 'Keynote by the community', 'End - TearDown'
 
-    $sessionss = $Schedule | Where-Object {($_.'Gate 1'.Trim() -notin $plenarysessions ) -and  ($_.'Gate 1'.Trim() -notlike 'KeyNote by the community*') -and ($_.'Gate 1'.Trim() -notlike 'SQLBits 2024 Opening Keynote*') }| Select-Object * -ExcludeProperty 'Gate 13'
+    $sessionss = $Schedule | Where-Object {($_.'Gate 1'.Trim() -notin $plenarysessions ) -and  ($_.'Gate 1'.Trim() -notlike 'KeyNote by the community*') -and ($_.'Gate 1'.Trim() -notlike 'SQLBits 2024 Opening Keynote*') }| Select-Object * -ExcludeProperty 'Gate 13','Experts Lounge'
 
 
 
