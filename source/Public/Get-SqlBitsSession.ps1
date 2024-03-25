@@ -82,8 +82,11 @@ Rob Sewell
     $SessionLength = @{Name='SessionLength'; Expression = {($PsItem.categories | Where name -eq 'Session Length').categoryItems.name -replace ' sessoin', ''}}
     $sessionizeUrl =  @{Name='sessionizeUrl'; Expression = {'https://sessionize.com/app/organizer/session/12744/{0}' -f $PSItem.id}}
 
+    $UploadName = @{Name = 'UploadName'; Expression = { ($PsItem.questionAnswers | Where question -eq 'Presentation Upload').answerExtra} }
+    $UploadUri = @{Name = 'UploadUri'; Expression = { ($PsItem.questionAnswers | Where question -eq 'Presentation Upload').answer } }
+
     if($all){
-        $rawsessions | Select title,description,startsAt,EndsAt,$Speakers,$PrimaryTheme,$SessionLength,room,id,  $sessionizeUrl
+        $rawsessions | Select title,description,startsAt,EndsAt,$Speakers,$PrimaryTheme,$SessionLength,room,id,  $sessionizeUrl,$UploadName,$UploadUri
     }else{
         if ($search) {
 
@@ -91,9 +94,9 @@ Rob Sewell
                     $_.psobject.properties.Value -like "*$search*"
                 }
             }
-        $rawsessions | Where-Object {$PSItem.isServiceSession -eq $false -and $PsItem.isPlenumSession -eq $false } | Select-Object -Property *, $Results | Where-Object { $null -ne $_.Results }  | Select title,description,startsAt,EndsAt,$Speakers,$PrimaryTheme,$SessionLength,room,id
+        $rawsessions | Where-Object {$PSItem.isServiceSession -eq $false -and $PsItem.isPlenumSession -eq $false } | Select-Object -Property *, $Results | Where-Object { $null -ne $_.Results }  | Select title,description,startsAt,EndsAt,$Speakers,$PrimaryTheme,$SessionLength,room,id,$UploadName,$UploadUri
         } else {
-            $rawsessions | Where-Object {$PSItem.isServiceSession -eq $false -and $PsItem.isPlenumSession -eq $false } | Select title,description,startsAt,EndsAt,$Speakers,$PrimaryTheme,$SessionLength,room,id
+            $rawsessions | Where-Object {$PSItem.isServiceSession -eq $false -and $PsItem.isPlenumSession -eq $false } | Select title,description,startsAt,EndsAt,$Speakers,$PrimaryTheme,$SessionLength,room,id,$UploadName,$UploadUri
         }
     }
 
